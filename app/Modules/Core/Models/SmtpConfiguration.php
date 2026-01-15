@@ -108,37 +108,40 @@ class SmtpConfiguration extends Model
         $this->update(['is_default' => true, 'is_active' => true]);
     }
 
+    // Créer le transport SMTP
+    protected function createSmtpTransport(): \Symfony\Component\Mailer\Transport\TransportInterface
+    {
+        // Construire le DSN selon le type d'encryption
+        if ($this->encryption === 'ssl') {
+            // Pour SSL (port 465), utiliser smtps://
+            $dsn = sprintf(
+                'smtps://%s:%s@%s:%d?verify_peer=0',
+                urlencode($this->username),
+                urlencode($this->decrypted_password),
+                $this->host,
+                $this->port
+            );
+        } else {
+            // Pour TLS (port 587) ou sans encryption
+            $dsn = sprintf(
+                'smtp://%s:%s@%s:%d',
+                urlencode($this->username),
+                urlencode($this->decrypted_password),
+                $this->host,
+                $this->port
+            );
+        }
+
+        return \Symfony\Component\Mailer\Transport::fromDsn($dsn);
+    }
+
     // Tester la connexion SMTP
     public function testConnection(): array
     {
         try {
-            // Utiliser Symfony Mailer pour un test de connexion fiable
-            if ($this->encryption === 'ssl') {
-                // Pour SSL (port 465), utiliser smtps://
-                $dsn = sprintf(
-                    'smtps://%s:%s@%s:%d',
-                    urlencode($this->username),
-                    urlencode($this->decrypted_password),
-                    $this->host,
-                    $this->port
-                );
-            } else {
-                // Pour TLS (port 587) ou sans encryption
-                $scheme = $this->encryption === 'tls' ? 'smtp' : 'smtp';
-                $dsn = sprintf(
-                    '%s://%s:%s@%s:%d',
-                    $scheme,
-                    urlencode($this->username),
-                    urlencode($this->decrypted_password),
-                    $this->host,
-                    $this->port
-                );
-            }
+            $transport = $this->createSmtpTransport();
 
-            $transport = \Symfony\Component\Mailer\Transport::fromDsn($dsn);
-
-            // Tester la connexion en créant le transport
-            // Pour EsmtpTransport, on peut vérifier la connexion
+            // Tester la connexion en démarrant le transport
             if ($transport instanceof \Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport) {
                 $transport->start();
                 $transport->stop();
@@ -172,29 +175,8 @@ class SmtpConfiguration extends Model
     public function sendTestEmail(string $toEmail): array
     {
         try {
-            // Construire le DSN selon le type d'encryption
-            if ($this->encryption === 'ssl') {
-                // Pour SSL (port 465), utiliser smtps://
-                $dsn = sprintf(
-                    'smtps://%s:%s@%s:%d',
-                    urlencode($this->username),
-                    urlencode($this->decrypted_password),
-                    $this->host,
-                    $this->port
-                );
-            } else {
-                // Pour TLS (port 587) ou sans encryption
-                $dsn = sprintf(
-                    'smtp://%s:%s@%s:%d',
-                    urlencode($this->username),
-                    urlencode($this->decrypted_password),
-                    $this->host,
-                    $this->port
-                );
-            }
-
-            // Créer le transport via DSN
-            $transport = \Symfony\Component\Mailer\Transport::fromDsn($dsn);
+            // Créer le transport via la méthode centralisée
+            $transport = $this->createSmtpTransport();
 
             // Créer le mailer Symfony
             $mailer = new \Symfony\Component\Mailer\Mailer($transport);
