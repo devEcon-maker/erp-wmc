@@ -230,7 +230,7 @@ class UpdateService
     /**
      * Télécharger et appliquer une mise à jour
      */
-    public function downloadAndApplyUpdate(string $downloadUrl): array
+    public function downloadAndApplyUpdate(string $downloadUrl, string $targetVersion = null): array
     {
         try {
             // 1. Créer une sauvegarde d'abord
@@ -238,6 +238,8 @@ class UpdateService
             if (!$backup['success']) {
                 return $backup;
             }
+
+            Log::info("Début de la mise à jour vers v{$targetVersion} depuis: {$downloadUrl}");
 
             // 2. Mettre l'application en mode maintenance
             Artisan::call('down', ['--retry' => 60]);
@@ -253,6 +255,8 @@ class UpdateService
                     'message' => 'Échec du téléchargement de la mise à jour',
                 ];
             }
+
+            Log::info('Fichier téléchargé: ' . filesize($tempFile) . ' bytes');
 
             // 4. Extraire les fichiers
             $extractPath = storage_path('app/update_temp_' . time());
@@ -272,16 +276,21 @@ class UpdateService
             // 5. Copier les fichiers (en excluant certains fichiers sensibles)
             $this->copyUpdateFiles($extractPath);
 
-            // 6. Exécuter les migrations
+            // 6. Mettre à jour le fichier version.json avec la nouvelle version
+            if ($targetVersion) {
+                $this->updateVersionFile($targetVersion);
+            }
+
+            // 7. Exécuter les migrations
             Artisan::call('migrate', ['--force' => true]);
 
-            // 7. Vider les caches
+            // 8. Vider les caches
             Artisan::call('config:clear');
             Artisan::call('cache:clear');
             Artisan::call('view:clear');
             Artisan::call('route:clear');
 
-            // 8. Réinstaller les dépendances composer
+            // 9. Réinstaller les dépendances composer
             if (File::exists(base_path('composer.json'))) {
                 Log::info('Réinstallation des dépendances composer...');
                 $composerOutput = [];
@@ -290,20 +299,23 @@ class UpdateService
                 Log::info('Composer install terminé avec code: ' . $composerReturn);
             }
 
-            // 9. Nettoyer les fichiers temporaires
+            // 10. Nettoyer les fichiers temporaires
             File::delete($tempFile);
             File::deleteDirectory($extractPath);
 
-            // 10. Sortir du mode maintenance
+            // 11. Sortir du mode maintenance
             Artisan::call('up');
 
-            // 11. Enregistrer la mise à jour
-            $this->logUpdate();
+            // 12. Enregistrer la mise à jour
+            $newVersion = $this->getCurrentVersion();
+            $this->logUpdate("Mise à jour automatique vers v{$newVersion['version']}");
+
+            Log::info("Mise à jour terminée vers: v{$newVersion['version']}");
 
             return [
                 'success' => true,
-                'message' => 'Mise à jour appliquée avec succès',
-                'new_version' => $this->getCurrentVersion()['version'],
+                'message' => "Mise à jour vers v{$newVersion['version']} appliquée avec succès!",
+                'new_version' => $newVersion['version'],
             ];
         } catch (\Exception $e) {
             Artisan::call('up');
@@ -388,6 +400,25 @@ class UpdateService
         }
 
         Log::info("Update: {$copiedCount} fichiers copiés");
+    }
+
+    /**
+     * Mettre à jour le fichier version.json avec la nouvelle version
+     */
+    protected function updateVersionFile(string $newVersion): void
+    {
+        $versionData = $this->getCurrentVersion();
+
+        // Nettoyer la version (enlever le 'v' si présent)
+        $cleanVersion = ltrim($newVersion, 'v');
+
+        $versionData['version'] = $cleanVersion;
+        $versionData['build'] = date('YmdHis');
+        $versionData['release_date'] = date('Y-m-d');
+
+        File::put($this->versionFile, json_encode($versionData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        Log::info("Version mise à jour vers: {$cleanVersion}");
     }
 
     /**
@@ -531,7 +562,7 @@ class UpdateService
     /**
      * Appliquer une mise à jour depuis un fichier ZIP uploadé
      */
-    public function applyUpdateFromFile(string $filePath): array
+    public function applyUpdateFromFile(string $filePath, string $targetVersion = null): array
     {
         try {
             // Vérifier que le fichier existe
@@ -542,7 +573,7 @@ class UpdateService
                 ];
             }
 
-            Log::info('Début de la mise à jour manuelle depuis: ' . $filePath);
+            Log::info("Début de la mise à jour manuelle vers v{$targetVersion} depuis: {$filePath}");
 
             // 1. Mettre l'application en mode maintenance
             Artisan::call('down', ['--retry' => 60]);
@@ -567,7 +598,12 @@ class UpdateService
             // 3. Copier les fichiers de mise à jour
             $this->copyUpdateFiles($extractPath);
 
-            // 4. Vérifier si composer.json a été mis à jour et réinstaller les dépendances
+            // 4. Mettre à jour le fichier version.json avec la nouvelle version
+            if ($targetVersion) {
+                $this->updateVersionFile($targetVersion);
+            }
+
+            // 5. Vérifier si composer.json a été mis à jour et réinstaller les dépendances
             if (File::exists(base_path('composer.json'))) {
                 Log::info('Réinstallation des dépendances composer...');
                 $composerOutput = [];
@@ -579,33 +615,33 @@ class UpdateService
                 }
             }
 
-            // 5. Exécuter les migrations
+            // 6. Exécuter les migrations
             Artisan::call('migrate', ['--force' => true]);
             Log::info('Migrations exécutées');
 
-            // 6. Vider les caches
+            // 7. Vider les caches
             Artisan::call('config:clear');
             Artisan::call('cache:clear');
             Artisan::call('view:clear');
             Artisan::call('route:clear');
 
-            // 7. Optimiser si en production
+            // 8. Optimiser si en production
             if (app()->environment('production')) {
                 Artisan::call('config:cache');
                 Artisan::call('route:cache');
                 Artisan::call('view:cache');
             }
 
-            // 8. Nettoyer les fichiers temporaires
+            // 9. Nettoyer les fichiers temporaires
             File::deleteDirectory($extractPath);
 
-            // 9. Sortir du mode maintenance
+            // 10. Sortir du mode maintenance
             Artisan::call('up');
 
-            // 10. Enregistrer la mise à jour
-            $this->logUpdate('Mise à jour manuelle via upload');
-
+            // 11. Enregistrer la mise à jour
             $newVersion = $this->getCurrentVersion();
+            $this->logUpdate("Mise à jour manuelle vers v{$newVersion['version']}");
+
             Log::info('Mise à jour terminée vers: v' . $newVersion['version']);
 
             return [

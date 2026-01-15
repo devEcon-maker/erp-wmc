@@ -47,6 +47,7 @@ class Settings extends Component
     public $showBackupModal = false;
     public $selectedBackup = null;
     public $updateFile = null;
+    public $updateVersion = '';
     public $showUploadModal = false;
 
     protected function rules()
@@ -323,12 +324,13 @@ class Settings extends Component
         try {
             $updateService = app(UpdateService::class);
             $downloadUrl = $this->updateInfo['latest_info']['download_url'] ?? null;
+            $targetVersion = $this->updateInfo['latest_version'] ?? null;
 
             if (!$downloadUrl) {
                 throw new \Exception('URL de telechargement non disponible');
             }
 
-            $result = $updateService->downloadAndApplyUpdate($downloadUrl);
+            $result = $updateService->downloadAndApplyUpdate($downloadUrl, $targetVersion);
 
             if ($result['success']) {
                 $this->dispatch('notify', type: 'success', message: $result['message']);
@@ -346,7 +348,7 @@ class Settings extends Component
 
     public function restoreBackup(string $backupName)
     {
-        if (!auth()->user()->hasRole('super-admin')) {
+        if (!auth()->user()->hasRole('super_admin')) {
             $this->dispatch('notify', type: 'error', message: 'Seul le Super Admin peut restaurer les sauvegardes.');
             return;
         }
@@ -385,12 +387,14 @@ class Settings extends Component
     public function openUploadModal()
     {
         $this->updateFile = null;
+        $this->updateVersion = '';
         $this->showUploadModal = true;
     }
 
     public function closeUploadModal()
     {
         $this->updateFile = null;
+        $this->updateVersion = '';
         $this->showUploadModal = false;
     }
 
@@ -404,10 +408,12 @@ class Settings extends Component
 
         $this->validate([
             'updateFile' => 'required|file|mimes:zip|max:102400', // Max 100MB
+            'updateVersion' => 'required|string|max:20',
         ], [
             'updateFile.required' => 'Veuillez selectionner un fichier ZIP.',
             'updateFile.mimes' => 'Le fichier doit etre au format ZIP.',
             'updateFile.max' => 'Le fichier ne doit pas depasser 100 Mo.',
+            'updateVersion.required' => 'Veuillez indiquer le numero de version.',
         ]);
 
         $this->isApplyingUpdate = true;
@@ -425,8 +431,8 @@ class Settings extends Component
             $tempPath = $this->updateFile->store('updates', 'local');
             $fullPath = storage_path('app/' . $tempPath);
 
-            // Appliquer la mise à jour depuis le fichier uploadé
-            $result = $updateService->applyUpdateFromFile($fullPath);
+            // Appliquer la mise à jour depuis le fichier uploadé avec la version cible
+            $result = $updateService->applyUpdateFromFile($fullPath, $this->updateVersion);
 
             // Supprimer le fichier temporaire
             if (file_exists($fullPath)) {
@@ -437,6 +443,7 @@ class Settings extends Component
                 $this->dispatch('notify', type: 'success', message: $result['message']);
                 $this->showUploadModal = false;
                 $this->updateFile = null;
+                $this->updateVersion = '';
                 // Recharger la page après succès
                 $this->dispatch('reload-page');
             } else {

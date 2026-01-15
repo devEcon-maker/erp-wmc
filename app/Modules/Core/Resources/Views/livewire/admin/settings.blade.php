@@ -703,13 +703,24 @@
                                         <div class="text-sm text-text-secondary">
                                             <p class="font-medium text-white mb-1">Instructions:</p>
                                             <ul class="list-disc list-inside space-y-1">
+                                                <li>Indiquez le numero de version (ex: 1.1.4)</li>
                                                 <li>Selectionnez le fichier ZIP de mise a jour</li>
                                                 <li>Une sauvegarde sera creee automatiquement</li>
-                                                <li>Le fichier doit contenir le code source mis a jour</li>
                                                 <li>Taille max: 100 Mo</li>
                                             </ul>
                                         </div>
                                     </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-white mb-2">Numero de version *</label>
+                                    <input type="text"
+                                        wire:model="updateVersion"
+                                        placeholder="Ex: 1.1.4"
+                                        class="w-full px-4 py-2 bg-surface-highlight border border-[#3a2e24] rounded-lg text-white placeholder-text-secondary focus:outline-none focus:border-primary" />
+                                    @error('updateVersion')
+                                        <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
+                                    @enderror
                                 </div>
 
                                 <div>
@@ -763,7 +774,7 @@
                             <x-ui.button type="secondary" wire:click="closeUploadModal">
                                 Annuler
                             </x-ui.button>
-                            <x-ui.button type="primary" submit :disabled="!$updateFile">
+                            <x-ui.button type="primary" submit :disabled="!$updateFile || !$updateVersion">
                                 <div wire:loading.remove wire:target="applyManualUpdate">
                                     Appliquer la mise a jour
                                 </div>
