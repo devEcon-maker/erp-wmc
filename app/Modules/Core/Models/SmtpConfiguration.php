@@ -221,21 +221,41 @@ class SmtpConfiguration extends Model
     public function sendTestEmail(string $toEmail): array
     {
         try {
-            // Configurer temporairement le mailer
-            config([
-                'mail.mailers.smtp.host' => $this->host,
-                'mail.mailers.smtp.port' => $this->port,
-                'mail.mailers.smtp.encryption' => $this->encryption ?: null,
-                'mail.mailers.smtp.username' => $this->username,
-                'mail.mailers.smtp.password' => $this->decrypted_password,
-                'mail.from.address' => $this->from_address,
-                'mail.from.name' => $this->from_name,
-            ]);
+            // Créer un transport SMTP personnalisé pour ce test
+            $transport = new \Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport(
+                $this->host,
+                $this->port,
+                $this->encryption === 'tls'
+            );
 
-            Mail::raw('Ceci est un email de test depuis ERP WMC. Configuration: ' . $this->name, function ($message) use ($toEmail) {
-                $message->to($toEmail)
-                    ->subject('Test SMTP - ' . $this->name . ' - ' . now()->format('d/m/Y H:i'));
-            });
+            // Pour SSL sur le port 465, utiliser une connexion sécurisée native
+            if ($this->encryption === 'ssl') {
+                $dsn = sprintf(
+                    'smtps://%s:%s@%s:%d',
+                    urlencode($this->username),
+                    urlencode($this->decrypted_password),
+                    $this->host,
+                    $this->port
+                );
+                $transport = \Symfony\Component\Mailer\Transport::fromDsn($dsn);
+            } else {
+                // Pour TLS ou sans encryption
+                $transport->setUsername($this->username);
+                $transport->setPassword($this->decrypted_password);
+            }
+
+            // Créer le mailer Symfony
+            $mailer = new \Symfony\Component\Mailer\Mailer($transport);
+
+            // Créer l'email
+            $email = (new \Symfony\Component\Mime\Email())
+                ->from(new \Symfony\Component\Mime\Address($this->from_address, $this->from_name))
+                ->to($toEmail)
+                ->subject('Test SMTP - ' . $this->name . ' - ' . now()->format('d/m/Y H:i'))
+                ->text('Ceci est un email de test depuis ERP WMC. Configuration: ' . $this->name . "\n\nEnvoyé le: " . now()->format('d/m/Y à H:i:s'));
+
+            // Envoyer l'email
+            $mailer->send($email);
 
             $this->update([
                 'last_tested_at' => now(),
