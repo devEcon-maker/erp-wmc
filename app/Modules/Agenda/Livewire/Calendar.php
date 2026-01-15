@@ -87,14 +87,43 @@ class Calendar extends Component
     }
 
     // Event Modal
-    public function openEventModal()
+    public function openEventModal($type = null)
     {
         $this->resetEventForm();
         $this->eventForm['start_at'] = now()->format('Y-m-d');
         $this->eventForm['start_time'] = now()->addHour()->startOfHour()->format('H:i');
         $this->eventForm['end_at'] = now()->format('Y-m-d');
         $this->eventForm['end_time'] = now()->addHours(2)->startOfHour()->format('H:i');
+
+        // Définir le type et la couleur selon l'action rapide
+        if ($type) {
+            $this->eventForm['type'] = $type;
+            $this->eventForm['color'] = match($type) {
+                'meeting' => '#3B82F6', // blue-500
+                'call' => '#22C55E',    // green-500
+                'reminder' => '#EAB308', // yellow-500
+                'task' => '#8B5CF6',    // purple-500
+                default => '#E76F51',   // primary
+            };
+        }
+
         $this->showEventModal = true;
+    }
+
+    // Actions rapides
+    public function quickMeeting()
+    {
+        $this->openEventModal('meeting');
+    }
+
+    public function quickCall()
+    {
+        $this->openEventModal('call');
+    }
+
+    public function quickReminder()
+    {
+        $this->openEventModal('reminder');
     }
 
     public function createEventOnDate($date)

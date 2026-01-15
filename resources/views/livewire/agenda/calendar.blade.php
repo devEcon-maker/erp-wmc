@@ -181,19 +181,19 @@
                     Actions rapides
                 </h3>
                 <div class="space-y-2">
-                    <button wire:click="$set('eventForm.type', 'meeting'); openEventModal()"
+                    <button wire:click="quickMeeting"
                         class="w-full p-2 text-left text-sm text-text-secondary hover:text-white hover:bg-surface-highlight rounded-lg flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[18px]">groups</span>
+                        <span class="material-symbols-outlined text-[18px] text-blue-400">groups</span>
                         Nouvelle réunion
                     </button>
-                    <button wire:click="$set('eventForm.type', 'call'); openEventModal()"
+                    <button wire:click="quickCall"
                         class="w-full p-2 text-left text-sm text-text-secondary hover:text-white hover:bg-surface-highlight rounded-lg flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[18px]">call</span>
+                        <span class="material-symbols-outlined text-[18px] text-green-400">call</span>
                         Nouvel appel
                     </button>
-                    <button wire:click="$set('eventForm.type', 'reminder'); openEventModal()"
+                    <button wire:click="quickReminder"
                         class="w-full p-2 text-left text-sm text-text-secondary hover:text-white hover:bg-surface-highlight rounded-lg flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[18px]">notifications</span>
+                        <span class="material-symbols-outlined text-[18px] text-yellow-400">notifications</span>
                         Nouveau rappel
                     </button>
                 </div>
