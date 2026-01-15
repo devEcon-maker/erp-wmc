@@ -308,7 +308,7 @@ class Settings extends Component
     public function applyUpdate()
     {
         // Vérifier que l'utilisateur est super admin
-        if (!auth()->user()->hasRole('super-admin')) {
+        if (!auth()->user()->hasRole('super_admin')) {
             $this->dispatch('notify', type: 'error', message: 'Seul le Super Admin peut effectuer les mises a jour.');
             return;
         }

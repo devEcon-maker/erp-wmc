@@ -767,3 +767,15 @@
         </div>
     @endif
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('livewire:init', () => {
+        Livewire.on('reload-page', () => {
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        });
+    });
+</script>
+@endpush

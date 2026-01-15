@@ -18,7 +18,9 @@
       "Bash(ls:*)",
       "Bash(npm run build:*)",
       "Bash(git add:*)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(composer install:*)",
+      "Bash(chmod:*)"
     ]
   }
 }
