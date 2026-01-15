@@ -247,10 +247,14 @@
                                 class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-surface-highlight text-white hover:bg-surface-highlight/80 transition-colors"
                                 wire:loading.attr="disabled"
                                 wire:target="checkForUpdates">
-                                <span wire:loading.remove wire:target="checkForUpdates" class="material-symbols-outlined text-[18px]">refresh</span>
-                                <span wire:loading wire:target="checkForUpdates" class="material-symbols-outlined animate-spin text-[18px]">refresh</span>
-                                <span wire:loading.remove wire:target="checkForUpdates">Verifier les mises a jour</span>
-                                <span wire:loading wire:target="checkForUpdates">Verification...</span>
+                                <div wire:loading.remove wire:target="checkForUpdates" class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[18px]">refresh</span>
+                                    <span>Verifier les mises a jour</span>
+                                </div>
+                                <div wire:loading wire:target="checkForUpdates" class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined animate-spin text-[18px]">refresh</span>
+                                    <span>Verification...</span>
+                                </div>
                             </button>
                             <button wire:click="openUploadModal"
                                 class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-primary text-white hover:bg-primary/80 transition-colors">
@@ -293,10 +297,14 @@
                                             class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-colors"
                                             wire:loading.attr="disabled"
                                             wire:target="applyUpdate">
-                                            <span wire:loading.remove wire:target="applyUpdate" class="material-symbols-outlined text-[18px]">system_update_alt</span>
-                                            <span wire:loading wire:target="applyUpdate" class="material-symbols-outlined animate-spin text-[18px]">refresh</span>
-                                            <span wire:loading.remove wire:target="applyUpdate">Appliquer la mise a jour</span>
-                                            <span wire:loading wire:target="applyUpdate">Mise a jour en cours...</span>
+                                            <div wire:loading.remove wire:target="applyUpdate" class="flex items-center gap-2">
+                                                <span class="material-symbols-outlined text-[18px]">system_update_alt</span>
+                                                <span>Appliquer la mise a jour</span>
+                                            </div>
+                                            <div wire:loading wire:target="applyUpdate" class="flex items-center gap-2">
+                                                <span class="material-symbols-outlined animate-spin text-[18px]">refresh</span>
+                                                <span>Mise a jour en cours...</span>
+                                            </div>
                                         </button>
                                     </div>
                                 </div>
@@ -394,10 +402,14 @@
                         class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
                         wire:loading.attr="disabled"
                         wire:target="createBackup">
-                        <span wire:loading.remove wire:target="createBackup" class="material-symbols-outlined text-[18px]">add</span>
-                        <span wire:loading wire:target="createBackup" class="material-symbols-outlined animate-spin text-[18px]">refresh</span>
-                        <span wire:loading.remove wire:target="createBackup">Nouvelle sauvegarde</span>
-                        <span wire:loading wire:target="createBackup">Creation...</span>
+                        <div wire:loading.remove wire:target="createBackup" class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[18px]">add</span>
+                            <span>Nouvelle sauvegarde</span>
+                        </div>
+                        <div wire:loading wire:target="createBackup" class="flex items-center gap-2">
+                            <span class="material-symbols-outlined animate-spin text-[18px]">refresh</span>
+                            <span>Creation...</span>
+                        </div>
                     </button>
                 </div>
 
@@ -521,7 +533,7 @@
 
     <!-- Modal SMTP -->
     @if($showSmtpModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 z-[100] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
             <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                 <div class="fixed inset-0 bg-black/70 transition-opacity" wire:click="closeSmtpModal"></div>
 
@@ -604,13 +616,13 @@
                                 Annuler
                             </x-ui.button>
                             <x-ui.button type="primary" submit>
-                                <span wire:loading.remove wire:target="saveSmtp">
+                                <div wire:loading.remove wire:target="saveSmtp">
                                     {{ $editingSmtp ? 'Mettre a jour' : 'Creer la configuration' }}
-                                </span>
-                                <span wire:loading wire:target="saveSmtp" class="flex items-center gap-2">
+                                </div>
+                                <div wire:loading wire:target="saveSmtp" class="flex items-center gap-2">
                                     <span class="material-symbols-outlined animate-spin text-[18px]">refresh</span>
                                     Enregistrement...
-                                </span>
+                                </div>
                             </x-ui.button>
                         </div>
                     </form>
@@ -621,7 +633,7 @@
 
     <!-- Modal Test Email -->
     @if($showTestModal && $testingSmtp)
-        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 z-[100] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
             <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                 <div class="fixed inset-0 bg-black/70 transition-opacity" wire:click="$set('showTestModal', false)"></div>
 
@@ -652,13 +664,13 @@
                             Annuler
                         </x-ui.button>
                         <x-ui.button type="primary" wire:click="sendTestEmail">
-                            <span wire:loading.remove wire:target="sendTestEmail">
+                            <div wire:loading.remove wire:target="sendTestEmail">
                                 Envoyer le test
-                            </span>
-                            <span wire:loading wire:target="sendTestEmail" class="flex items-center gap-2">
+                            </div>
+                            <div wire:loading wire:target="sendTestEmail" class="flex items-center gap-2">
                                 <span class="material-symbols-outlined animate-spin text-[18px]">refresh</span>
                                 Envoi...
-                            </span>
+                            </div>
                         </x-ui.button>
                     </div>
                 </div>
@@ -668,7 +680,7 @@
 
     <!-- Modal Upload Mise à jour -->
     @if($showUploadModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 z-[100] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
             <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                 <div class="fixed inset-0 bg-black/70 transition-opacity" wire:click="closeUploadModal"></div>
 
@@ -752,13 +764,13 @@
                                 Annuler
                             </x-ui.button>
                             <x-ui.button type="primary" submit :disabled="!$updateFile">
-                                <span wire:loading.remove wire:target="applyManualUpdate">
+                                <div wire:loading.remove wire:target="applyManualUpdate">
                                     Appliquer la mise a jour
-                                </span>
-                                <span wire:loading wire:target="applyManualUpdate" class="flex items-center gap-2">
+                                </div>
+                                <div wire:loading wire:target="applyManualUpdate" class="flex items-center gap-2">
                                     <span class="material-symbols-outlined animate-spin text-[18px]">refresh</span>
                                     Mise a jour en cours...
-                                </span>
+                                </div>
                             </x-ui.button>
                         </div>
                     </form>

@@ -336,9 +336,17 @@ class UpdateService
             'composer.lock',
         ];
 
-        // Trouver le répertoire racine dans le ZIP (GitHub ajoute un préfixe comme "repo-main/")
+        // Trouver le répertoire racine dans le ZIP
         $directories = File::directories($sourcePath);
-        $sourceRoot = count($directories) === 1 ? $directories[0] : $sourcePath;
+
+        // Filtrer les dossiers système/cachés pour trouver le vrai dossier racine
+        $realDirectories = array_filter($directories, function ($dir) {
+            $basename = basename($dir);
+            return !in_array($basename, ['__MACOSX', '.git', '.github', '.idea', '.vscode']);
+        });
+
+        // Si un seul vrai dossier, c'est lui la racine
+        $sourceRoot = count($realDirectories) === 1 ? reset($realDirectories) : $sourcePath;
 
         $files = File::allFiles($sourceRoot);
         $copiedCount = 0;
