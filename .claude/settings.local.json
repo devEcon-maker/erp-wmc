@@ -14,7 +14,9 @@
       "Bash(php:*)",
       "Bash(find:*)",
       "Bash(xargs:*)",
-      "Bash(mysql:*)"
+      "Bash(mysql:*)",
+      "Bash(ls:*)",
+      "Bash(npm run build:*)"
     ]
   }
 }

@@ -46,23 +46,37 @@ class UpdateService
     {
         try {
             $current = $this->getCurrentVersion();
+            $githubRepo = config('app.github_repo', '');
+            $customServer = config('app.update_server', '');
 
-            // Pour le développement, on peut aussi vérifier un fichier local ou GitHub
-            $response = Http::timeout(30)->get("{$this->updateServer}/api/v1/latest");
-
-            if (!$response->successful()) {
-                // Fallback: vérifier GitHub releases si configuré
+            // Priorité 1: GitHub si configuré
+            if (!empty($githubRepo)) {
                 return $this->checkGitHubReleases($current);
             }
 
-            $latest = $response->json();
+            // Priorité 2: Serveur personnalisé si configuré et différent du défaut
+            if (!empty($customServer) && $customServer !== 'https://updates.erp-wmc.com') {
+                $response = Http::timeout(30)->get("{$customServer}/api/v1/latest");
 
+                if ($response->successful()) {
+                    $latest = $response->json();
+
+                    return [
+                        'current_version' => $current['version'],
+                        'latest_version' => $latest['version'] ?? $current['version'],
+                        'update_available' => version_compare($latest['version'] ?? '0', $current['version'], '>'),
+                        'latest_info' => $latest,
+                        'changelog' => $latest['changelog'] ?? [],
+                    ];
+                }
+            }
+
+            // Aucune source configurée
             return [
                 'current_version' => $current['version'],
-                'latest_version' => $latest['version'] ?? $current['version'],
-                'update_available' => version_compare($latest['version'] ?? '0', $current['version'], '>'),
-                'latest_info' => $latest,
-                'changelog' => $latest['changelog'] ?? [],
+                'latest_version' => $current['version'],
+                'update_available' => false,
+                'message' => 'Configurez GITHUB_REPO dans .env pour activer les mises à jour automatiques',
             ];
         } catch (\Exception $e) {
             Log::warning('Update check failed: ' . $e->getMessage());

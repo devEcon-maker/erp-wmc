@@ -5,509 +5,371 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Facture {{ $invoice->reference }}</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        @page {
+            margin: 1cm 1.5cm 2cm 1.5cm;
+            size: A4;
         }
 
         body {
-            font-family: 'DejaVu Sans', sans-serif;
-            font-size: 12px;
+            font-family: 'DejaVu Sans', 'Helvetica', 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
             color: #333;
-            line-height: 1.5;
+            font-size: 9pt;
+            line-height: 1.3;
         }
 
-        .container {
-            padding: 30px;
-        }
-
+        /* Header */
         .header {
-            display: table;
             width: 100%;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
         }
 
         .header-left {
-            display: table-cell;
+            float: left;
             width: 50%;
-            vertical-align: top;
         }
 
         .header-right {
-            display: table-cell;
+            float: right;
             width: 50%;
-            vertical-align: top;
+            text-align: right;
+            padding-top: 30px;
+        }
+
+        .logo {
+            max-height: 70px;
+            max-width: 180px;
+        }
+
+        .date-location {
+            font-size: 10pt;
+            color: #333;
+        }
+
+        .clearfix {
+            clear: both;
+        }
+
+        /* Document Title */
+        .document-title {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #333;
+            margin: 20px 0 15px 0;
+        }
+
+        /* Client Section */
+        .client-section {
+            margin-bottom: 15px;
             text-align: right;
         }
 
-        .company-name {
-            font-size: 20px;
-            font-weight: bold;
-            color: #D97706;
-            margin-bottom: 8px;
-        }
-
-        .company-info {
-            font-size: 11px;
-            color: #666;
-        }
-
-        .document-title {
-            font-size: 28px;
-            font-weight: bold;
+        .client-label {
+            font-size: 10pt;
             color: #333;
-            margin-bottom: 10px;
+            text-decoration: underline;
         }
 
-        .document-info {
-            font-size: 11px;
-            color: #666;
-        }
-
-        .document-info strong {
-            color: #333;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-size: 10px;
+        .client-name {
+            font-size: 10pt;
             font-weight: bold;
-            text-transform: uppercase;
-            margin-top: 8px;
+            color: #ea580c;
         }
 
-        .status-draft { background: #e5e7eb; color: #374151; }
-        .status-sent { background: #dbeafe; color: #1d4ed8; }
-        .status-partial { background: #ffedd5; color: #c2410c; }
-        .status-paid { background: #dcfce7; color: #15803d; }
-        .status-overdue { background: #fee2e2; color: #dc2626; }
-        .status-cancelled { background: #f3f4f6; color: #6b7280; }
-
-        .parties {
-            display: table;
-            width: 100%;
-            margin-bottom: 30px;
-        }
-
-        .party {
-            display: table-cell;
-            width: 50%;
-            vertical-align: top;
-        }
-
-        .party-box {
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 15px;
-            margin-right: 15px;
-        }
-
-        .party-box.right {
-            margin-right: 0;
-            margin-left: 15px;
-        }
-
-        .party-title {
-            font-size: 10px;
-            font-weight: bold;
-            text-transform: uppercase;
-            color: #666;
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
-        }
-
-        .party-name {
-            font-size: 14px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 4px;
-        }
-
-        .party-details {
-            font-size: 11px;
-            color: #666;
-        }
-
-        table.items {
+        /* Main Table */
+        .invoice-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
+            font-size: 8pt;
         }
 
-        table.items thead {
-            background: #D97706;
-        }
-
-        table.items th {
-            padding: 12px;
-            text-align: left;
-            font-size: 10px;
-            font-weight: bold;
-            text-transform: uppercase;
+        .invoice-table th {
+            background-color: #ea580c;
             color: white;
-            letter-spacing: 0.5px;
-        }
-
-        table.items th.right {
-            text-align: right;
-        }
-
-        table.items th.center {
+            padding: 6px 4px;
             text-align: center;
+            font-size: 8pt;
+            font-weight: bold;
+            border: 1px solid #ea580c;
         }
 
-        table.items tbody tr {
-            border-bottom: 1px solid #e5e7eb;
+        .invoice-table td {
+            padding: 5px 4px;
+            border: 1px solid #ddd;
+            font-size: 8pt;
         }
 
-        table.items tbody tr:nth-child(even) {
-            background: #f9fafb;
-        }
-
-        table.items td {
-            padding: 12px;
-            font-size: 11px;
-        }
-
-        table.items td.right {
-            text-align: right;
-        }
-
-        table.items td.center {
+        .invoice-table td:first-child {
             text-align: center;
+            width: 5%;
         }
 
-        .totals-section {
-            display: table;
-            width: 100%;
-        }
-
-        .totals-spacer {
-            display: table-cell;
-            width: 60%;
-        }
-
-        .totals-box {
-            display: table-cell;
+        .invoice-table td:nth-child(2) {
             width: 40%;
         }
 
-        table.totals {
-            width: 100%;
-            border-collapse: collapse;
+        .invoice-table td:nth-child(3) {
+            text-align: center;
+            width: 8%;
         }
 
-        table.totals tr {
-            border-bottom: 1px solid #e5e7eb;
+        .invoice-table td:nth-child(4) {
+            text-align: center;
+            width: 8%;
         }
 
-        table.totals td {
-            padding: 8px 12px;
-            font-size: 11px;
-        }
-
-        table.totals td.label {
+        .invoice-table td:nth-child(5),
+        .invoice-table td:last-child {
             text-align: right;
-            color: #666;
+            width: 17%;
         }
 
-        table.totals td.value {
-            text-align: right;
+        /* Section Headers in Table */
+        .section-header td {
+            background-color: #f5f5f5;
             font-weight: bold;
-            width: 120px;
+            text-align: center !important;
+            font-size: 8pt;
+            padding: 4px;
         }
 
-        table.totals tr.discount td {
-            color: #15803d;
-        }
-
-        table.totals tr.paid td {
-            color: #15803d;
-        }
-
-        table.totals tr.remaining td {
-            color: #dc2626;
-        }
-
-        table.totals tr.total {
-            background: #D97706;
-            border: none;
-        }
-
-        table.totals tr.total td {
-            color: white;
-            font-size: 14px;
-            padding: 12px;
-        }
-
-        .payment-info {
-            margin-top: 30px;
-            padding: 15px;
-            background: #f0f9ff;
-            border: 1px solid #bae6fd;
-            border-radius: 8px;
-        }
-
-        .payment-title {
-            font-size: 11px;
+        /* Subtotals and Totals */
+        .subtotal-row td {
             font-weight: bold;
-            color: #0369a1;
-            margin-bottom: 8px;
+            background-color: #fafafa;
+            border: 1px solid #ddd;
         }
 
-        .payment-content {
-            font-size: 11px;
-            color: #0c4a6e;
+        .discount-row td {
+            color: #ea580c;
         }
 
+        .total-row td {
+            background-color: #ea580c;
+            color: white !important;
+            font-weight: bold;
+            font-size: 9pt;
+            padding: 8px 4px;
+            border: 1px solid #ea580c;
+        }
+
+        /* Amount in Words */
+        .amount-words {
+            margin: 12px 0;
+            font-size: 9pt;
+            text-align: justify;
+        }
+
+        /* Notes Section */
         .notes-section {
+            margin: 10px 0;
+            font-size: 8pt;
+            color: #555;
+        }
+
+        .notes-section p {
+            margin: 3px 0;
+        }
+
+        /* Signature Section */
+        .signature-section {
             margin-top: 20px;
-            padding: 15px;
-            background: #fffbeb;
-            border: 1px solid #fcd34d;
-            border-radius: 8px;
-        }
-
-        .notes-title {
-            font-size: 11px;
-            font-weight: bold;
-            color: #92400e;
-            margin-bottom: 8px;
-        }
-
-        .notes-content {
-            font-size: 11px;
-            color: #78350f;
-        }
-
-        .payments-history {
-            margin-top: 20px;
-        }
-
-        .payments-history h4 {
-            font-size: 12px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        table.payments {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 10px;
-        }
-
-        table.payments th {
-            background: #f3f4f6;
-            padding: 8px;
-            text-align: left;
-            font-weight: bold;
-        }
-
-        table.payments td {
-            padding: 8px;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        table.payments td.right {
             text-align: right;
         }
 
+        .signature-title {
+            font-size: 11pt;
+            font-weight: bold;
+            color: #ea580c;
+        }
+
+        /* Payment Conditions */
+        .payment-conditions {
+            margin-top: 15px;
+            font-size: 8pt;
+        }
+
+        .payment-conditions strong {
+            text-decoration: underline;
+        }
+
+        /* Footer */
         .footer {
             position: fixed;
-            bottom: 20px;
-            left: 30px;
-            right: 30px;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            border-top: 2px solid #ea580c;
+            padding: 8px 0;
             text-align: center;
-            font-size: 9px;
-            color: #999;
-            border-top: 1px solid #e5e7eb;
-            padding-top: 10px;
+            font-size: 7pt;
+            color: #555;
+            line-height: 1.4;
+        }
+
+        /* Utilities */
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .bold {
+            font-weight: bold;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="header-left">
-                <div class="company-name">{{ config('app.name', 'ERP-WMC') }}</div>
-                <div class="company-info">
-                    123 Rue de l'Innovation<br>
-                    Dakar, Sénégal<br>
-                    contact@erp-wmc.com
+    <!-- Header: Logo + Date -->
+    <div class="header">
+        <div class="header-left">
+            @if(file_exists(public_path('logo_wmc_orange.png')))
+                <img src="{{ public_path('logo_wmc_orange.png') }}" class="logo" alt="Logo">
+            @else
+                <div style="font-size: 18pt; font-weight: bold; color: #ea580c;">
+                    {{ $company->name ?? config('app.name', 'ERP-WMC') }}
                 </div>
-            </div>
-            <div class="header-right">
-                <div class="document-title">FACTURE</div>
-                <div class="document-info">
-                    <strong>Référence:</strong> {{ $invoice->reference }}<br>
-                    <strong>Date d'émission:</strong> {{ $invoice->order_date->format('d/m/Y') }}<br>
-                    <strong>Date d'échéance:</strong> {{ $invoice->due_date->format('d/m/Y') }}
-                </div>
-                @php
-                    $statusLabels = [
-                        'draft' => 'Brouillon',
-                        'sent' => 'Envoyée',
-                        'partial' => 'Paiement Partiel',
-                        'paid' => 'Payée',
-                        'overdue' => 'En Retard',
-                        'cancelled' => 'Annulée',
-                    ];
-                @endphp
-                <span class="status-badge status-{{ $invoice->status }}">
-                    {{ $statusLabels[$invoice->status] ?? ucfirst($invoice->status) }}
-                </span>
+            @endif
+        </div>
+        <div class="header-right">
+            <div class="date-location">
+                {{ $company->city ?? 'Abidjan' }}, {{ ($invoice->order_date ?? now())->translatedFormat('d F Y') }}
             </div>
         </div>
+        <div class="clearfix"></div>
+    </div>
 
-        <!-- Parties -->
-        <div class="parties">
-            <div class="party">
-                <div class="party-box">
-                    <div class="party-title">Facturé à</div>
-                    <div class="party-name">{{ $invoice->contact->display_name }}</div>
-                    <div class="party-details">
-                        @if($invoice->contact->company_name && $invoice->contact->company_name !== $invoice->contact->display_name)
-                            {{ $invoice->contact->company_name }}<br>
-                        @endif
-                        @if($invoice->contact->address){{ $invoice->contact->address }}<br>@endif
-                        @if($invoice->contact->postal_code || $invoice->contact->city)
-                            {{ $invoice->contact->postal_code }} {{ $invoice->contact->city }}<br>
-                        @endif
-                        @if($invoice->contact->country){{ $invoice->contact->country }}<br>@endif
-                        @if($invoice->contact->email){{ $invoice->contact->email }}<br>@endif
-                        @if($invoice->contact->phone)Tél: {{ $invoice->contact->phone }}@endif
-                    </div>
-                </div>
-            </div>
-            <div class="party">
-                <div class="party-box right">
-                    <div class="party-title">Informations de paiement</div>
-                    <div class="party-details">
-                        <strong>Mode de paiement:</strong> Virement bancaire<br>
-                        <strong>IBAN:</strong> SN00 0000 0000 0000 0000 0000<br>
-                        <strong>BIC:</strong> BICSENXXXX<br>
-                        <strong>Banque:</strong> Banque Nationale
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Items Table -->
-        <table class="items">
-            <thead>
-                <tr>
-                    <th style="width: 50%">Description</th>
-                    <th class="right" style="width: 15%">Prix Unitaire</th>
-                    <th class="center" style="width: 10%">Qté</th>
-                    <th class="center" style="width: 10%">TVA</th>
-                    <th class="right" style="width: 15%">Total HT</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($invoice->lines as $line)
-                    <tr>
-                        <td>{{ $line->description }}</td>
-                        <td class="right">{{ number_format($line->unit_price, 0, ',', ' ') }} FCFA</td>
-                        <td class="center">{{ $line->quantity }}</td>
-                        <td class="center">{{ number_format($line->tax_rate ?? 0, 0) }}%</td>
-                        <td class="right">{{ number_format($line->total_amount, 0, ',', ' ') }} FCFA</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-
-        <!-- Totals -->
-        <div class="totals-section">
-            <div class="totals-spacer"></div>
-            <div class="totals-box">
-                <table class="totals">
-                    <tr>
-                        <td class="label">Total HT</td>
-                        <td class="value">{{ number_format($invoice->total_amount, 0, ',', ' ') }} FCFA</td>
-                    </tr>
-                    @if($invoice->discount_amount > 0)
-                        <tr class="discount">
-                            <td class="label">Remise</td>
-                            <td class="value">-{{ number_format($invoice->discount_amount, 0, ',', ' ') }} FCFA</td>
-                        </tr>
-                    @endif
-                    <tr>
-                        <td class="label">TVA</td>
-                        <td class="value">{{ number_format($invoice->tax_amount, 0, ',', ' ') }} FCFA</td>
-                    </tr>
-                    <tr class="total">
-                        <td class="label">Total TTC</td>
-                        <td class="value">{{ number_format($invoice->total_amount_ttc, 0, ',', ' ') }} FCFA</td>
-                    </tr>
-                    @if($invoice->paid_amount > 0)
-                        <tr class="paid">
-                            <td class="label">Déjà payé</td>
-                            <td class="value">-{{ number_format($invoice->paid_amount, 0, ',', ' ') }} FCFA</td>
-                        </tr>
-                        <tr class="remaining">
-                            <td class="label"><strong>Reste à payer</strong></td>
-                            <td class="value"><strong>{{ number_format($invoice->remaining_balance, 0, ',', ' ') }} FCFA</strong></td>
-                        </tr>
-                    @endif
-                </table>
-            </div>
-        </div>
-
-        <!-- Payments History -->
-        @if($invoice->payments->count() > 0)
-            <div class="payments-history">
-                <h4>Historique des paiements</h4>
-                <table class="payments">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Mode</th>
-                            <th>Référence</th>
-                            <th class="right">Montant</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($invoice->payments as $payment)
-                            <tr>
-                                <td>{{ $payment->payment_date->format('d/m/Y') }}</td>
-                                <td>{{ ucfirst(str_replace('_', ' ', $payment->payment_method)) }}</td>
-                                <td>{{ $payment->reference ?? '-' }}</td>
-                                <td class="right">{{ number_format($payment->amount, 0, ',', ' ') }} FCFA</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @endif
-
-        <!-- Payment Info -->
-        <div class="payment-info">
-            <div class="payment-title">Conditions de paiement</div>
-            <div class="payment-content">
-                Paiement à réception de facture. Tout retard de paiement entraînera des pénalités de retard
-                calculées au taux légal en vigueur. Une indemnité forfaitaire de 40€ pour frais de recouvrement
-                sera également due en cas de retard.
-            </div>
-        </div>
-
-        <!-- Notes -->
-        @if($invoice->notes)
-            <div class="notes-section">
-                <div class="notes-title">Notes</div>
-                <div class="notes-content">{{ $invoice->notes }}</div>
-            </div>
+    <!-- Document Title -->
+    <div class="document-title">
+        @if($invoice->type === 'proforma')
+            FACTURE PROFORMA {{ $invoice->reference }}
+        @else
+            FACTURE {{ $invoice->reference }}
         @endif
     </div>
 
+    <!-- Client -->
+    <div class="client-section">
+        <span class="client-label">Client</span> : <span class="client-name">{{ $invoice->contact->company_name ?? $invoice->contact->display_name }}</span>
+    </div>
+
+    <!-- Invoice Table -->
+    <table class="invoice-table">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Désignation</th>
+                <th>Unité</th>
+                <th>Qté</th>
+                <th>Prix Unitaire</th>
+                <th>Montant</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php
+                $lineNumber = 0;
+                $currentSection = null;
+            @endphp
+
+            @foreach($invoice->lines as $line)
+                @php $lineNumber++; @endphp
+
+                {{-- Section Header if category changed --}}
+                @if(isset($line->category) && $line->category !== $currentSection)
+                    @php $currentSection = $line->category; @endphp
+                    <tr class="section-header">
+                        <td colspan="6">{{ $line->category }}</td>
+                    </tr>
+                @endif
+
+                <tr>
+                    <td>{{ $lineNumber }}</td>
+                    <td>{{ $line->product->name ?? $line->description ?? 'Article' }}</td>
+                    <td>{{ $line->unit ?? 'PCS' }}</td>
+                    <td>{{ $line->quantity }}</td>
+                    <td>{{ number_format($line->unit_price, 0, ',', ' ') }}</td>
+                    <td>{{ number_format($line->total_amount, 0, ',', ' ') }}</td>
+                </tr>
+            @endforeach
+
+            {{-- Subtotal Row --}}
+            <tr class="subtotal-row">
+                <td colspan="5" class="text-right">Montant</td>
+                <td class="text-right">{{ number_format($invoice->subtotal ?? $invoice->total_amount, 0, ',', ' ') }}</td>
+            </tr>
+
+            {{-- Discount Row (if applicable) --}}
+            @if(($invoice->discount_percentage ?? 0) > 0 || ($invoice->discount_amount ?? 0) > 0)
+                <tr class="discount-row">
+                    <td colspan="5" class="text-right">
+                        Remise {{ $invoice->discount_percentage ?? '' }}{{ $invoice->discount_percentage ? '%' : '' }}
+                    </td>
+                    <td class="text-right">{{ number_format($invoice->discount_amount ?? 0, 0, ',', ' ') }}</td>
+                </tr>
+                <tr class="subtotal-row">
+                    <td colspan="5" class="text-right">Montant Total</td>
+                    <td class="text-right">{{ number_format(($invoice->subtotal ?? $invoice->total_amount) - ($invoice->discount_amount ?? 0), 0, ',', ' ') }}</td>
+                </tr>
+            @endif
+
+            {{-- Tax Row (if applicable) --}}
+            @if(($invoice->tax_amount ?? 0) > 0)
+                <tr>
+                    <td colspan="5" class="text-right">TVA ({{ $invoice->tax_rate ?? 18 }}%)</td>
+                    <td class="text-right">{{ number_format($invoice->tax_amount, 0, ',', ' ') }}</td>
+                </tr>
+            @endif
+
+            {{-- Grand Total --}}
+            <tr class="total-row">
+                <td colspan="5" class="text-right">Montant Total A Payer</td>
+                <td class="text-right">{{ number_format($invoice->total_amount_ttc ?? $invoice->total_amount, 0, ',', ' ') }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Amount in Words -->
+    <div class="amount-words">
+        Arrêtée la présente facture {{ $invoice->type === 'proforma' ? 'pro-forma ' : '' }}à la somme de :
+        <strong>{{ ucfirst($amountInWords ?? 'zéro') }} ({{ number_format($invoice->total_amount_ttc ?? $invoice->total_amount, 0, ',', ' ') }}) FCFA.</strong>
+    </div>
+
+    <!-- Notes -->
+    @if($invoice->notes)
+        <div class="notes-section">
+            <strong>NB :</strong>
+            @foreach(explode("\n", $invoice->notes) as $note)
+                @if(trim($note))
+                    <p>- {{ trim($note) }}</p>
+                @endif
+            @endforeach
+        </div>
+    @endif
+
+    <!-- Signature Section -->
+    <div class="signature-section">
+        <div class="signature-title">DIRECTION DES OPERATIONS</div>
+    </div>
+
+    <!-- Payment Conditions -->
+    @if($invoice->payment_terms ?? $invoice->terms)
+        <div class="payment-conditions">
+            <p><strong>Conditions de Paiement :</strong></p>
+            <p>{{ $invoice->payment_terms ?? $invoice->terms }}</p>
+        </div>
+    @endif
+
+    <!-- Footer -->
     <div class="footer">
-        Document généré le {{ now()->format('d/m/Y à H:i') }} | {{ config('app.name', 'ERP-WMC') }}
+        {{ $company->legal_form ?? 'SARL' }} Au Capital de : {{ number_format($company->capital ?? 1000000, 0, ',', '.') }} FCFA. {{ $company->address ?? '' }}<br>
+        Tel : {{ $company->phone ?? '' }}<br>
+        RCCM n° {{ $company->rccm ?? '' }}. Compte bancaire : {{ $company->bank_name ?? '' }} {{ $company->bank_account ?? '' }}<br>
+        E-mail : {{ $company->email ?? '' }}
     </div>
 </body>
 
