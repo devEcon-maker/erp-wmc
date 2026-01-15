@@ -1,0 +1,8 @@
+{
+    "version": "1.0.0",
+    "build": "2026011201",
+    "release_date": "2026-01-12",
+    "codename": "Genesis",
+    "minimum_php": "8.2",
+    "minimum_laravel": "12.0"
+}

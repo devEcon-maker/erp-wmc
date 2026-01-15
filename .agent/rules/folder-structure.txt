@@ -1,0 +1,686 @@
+# Structure du Projet CRM & ERP Laravel/Livewire
+
+```
+crm-erp/
+│
+├── app/
+│   ├── Console/
+│   │   └── Commands/
+│   │       ├── ContractsGenerateInvoices.php
+│   │       ├── InvoicesCheckOverdue.php
+│   │       ├── InvoicesSendReminders.php
+│   │       ├── EventsSendReminders.php
+│   │       ├── LeavesResetBalances.php
+│   │       └── StockCheckAlerts.php
+│   │
+│   ├── Helpers/
+│   │   └── helpers.php
+│   │
+│   ├── Modules/
+│   │   │
+│   │   ├── Core/
+│   │   │   ├── Models/
+│   │   │   │   ├── User.php
+│   │   │   │   ├── Company.php
+│   │   │   │   └── Setting.php
+│   │   │   ├── Livewire/
+│   │   │   │   ├── Dashboard.php
+│   │   │   │   ├── GlobalSearch.php
+│   │   │   │   ├── NotificationDropdown.php
+│   │   │   │   ├── NotificationsList.php
+│   │   │   │   ├── UserManagement.php
+│   │   │   │   ├── UserForm.php
+│   │   │   │   ├── RolePermissions.php
+│   │   │   │   └── Settings.php
+│   │   │   ├── Services/
+│   │   │   │   ├── GlobalSearchService.php
+│   │   │   │   ├── SettingService.php
+│   │   │   │   └── ExportService.php
+│   │   │   ├── Policies/
+│   │   │   │   ├── UserPolicy.php
+│   │   │   │   └── SettingPolicy.php
+│   │   │   ├── Providers/
+│   │   │   │   └── CoreServiceProvider.php
+│   │   │   └── routes.php
+│   │   │
+│   │   ├── CRM/
+│   │   │   ├── Models/
+│   │   │   │   ├── Contact.php
+│   │   │   │   ├── Opportunity.php
+│   │   │   │   ├── OpportunityStage.php
+│   │   │   │   ├── Proposal.php
+│   │   │   │   ├── ProposalLine.php
+│   │   │   │   ├── Order.php
+│   │   │   │   ├── OrderLine.php
+│   │   │   │   ├── Contract.php
+│   │   │   │   └── ContractLine.php
+│   │   │   ├── Livewire/
+│   │   │   │   ├── Contacts/
+│   │   │   │   │   ├── ContactsList.php
+│   │   │   │   │   ├── ContactForm.php
+│   │   │   │   │   └── ContactShow.php
+│   │   │   │   ├── Opportunities/
+│   │   │   │   │   ├── OpportunityPipeline.php
+│   │   │   │   │   ├── OpportunityForm.php
+│   │   │   │   │   └── OpportunityShow.php
+│   │   │   │   ├── Proposals/
+│   │   │   │   │   ├── ProposalsList.php
+│   │   │   │   │   ├── ProposalBuilder.php
+│   │   │   │   │   └── ProposalShow.php
+│   │   │   │   ├── Orders/
+│   │   │   │   │   ├── OrdersList.php
+│   │   │   │   │   ├── OrderForm.php
+│   │   │   │   │   └── OrderShow.php
+│   │   │   │   └── Contracts/
+│   │   │   │       ├── ContractsList.php
+│   │   │   │       ├── ContractForm.php
+│   │   │   │       └── ContractShow.php
+│   │   │   ├── Services/
+│   │   │   │   ├── ContactService.php
+│   │   │   │   ├── OpportunityService.php
+│   │   │   │   ├── ProposalService.php
+│   │   │   │   ├── OrderService.php
+│   │   │   │   └── ContractService.php
+│   │   │   ├── Policies/
+│   │   │   │   ├── ContactPolicy.php
+│   │   │   │   ├── OpportunityPolicy.php
+│   │   │   │   ├── ProposalPolicy.php
+│   │   │   │   ├── OrderPolicy.php
+│   │   │   │   └── ContractPolicy.php
+│   │   │   ├── Exports/
+│   │   │   │   ├── ContactsExport.php
+│   │   │   │   └── OrdersExport.php
+│   │   │   ├── Providers/
+│   │   │   │   └── CRMServiceProvider.php
+│   │   │   └── routes.php
+│   │   │
+│   │   ├── HR/
+│   │   │   ├── Models/
+│   │   │   │   ├── Department.php
+│   │   │   │   ├── Employee.php
+│   │   │   │   ├── LeaveType.php
+│   │   │   │   ├── LeaveBalance.php
+│   │   │   │   ├── LeaveRequest.php
+│   │   │   │   ├── ExpenseCategory.php
+│   │   │   │   ├── ExpenseReport.php
+│   │   │   │   ├── ExpenseLine.php
+│   │   │   │   ├── Timesheet.php
+│   │   │   │   ├── JobPosition.php
+│   │   │   │   └── JobApplication.php
+│   │   │   ├── Livewire/
+│   │   │   │   ├── Employees/
+│   │   │   │   │   ├── EmployeesList.php
+│   │   │   │   │   ├── EmployeeForm.php
+│   │   │   │   │   ├── EmployeeShow.php
+│   │   │   │   │   └── OrgChart.php
+│   │   │   │   ├── Leaves/
+│   │   │   │   │   ├── LeaveBalances.php
+│   │   │   │   │   ├── LeaveRequestForm.php
+│   │   │   │   │   ├── LeaveRequestsList.php
+│   │   │   │   │   ├── LeaveCalendar.php
+│   │   │   │   │   └── LeaveApproval.php
+│   │   │   │   ├── Expenses/
+│   │   │   │   │   ├── ExpenseReportsList.php
+│   │   │   │   │   ├── ExpenseReportForm.php
+│   │   │   │   │   ├── ExpenseReportShow.php
+│   │   │   │   │   └── ExpenseApproval.php
+│   │   │   │   ├── Timesheets/
+│   │   │   │   │   ├── TimesheetWeekly.php
+│   │   │   │   │   ├── TimesheetDaily.php
+│   │   │   │   │   └── TimesheetReport.php
+│   │   │   │   └── Recruitment/
+│   │   │   │       ├── JobPositionsList.php
+│   │   │   │       ├── JobPositionForm.php
+│   │   │   │       ├── JobPositionShow.php
+│   │   │   │       ├── ApplicationsKanban.php
+│   │   │   │       ├── ApplicationForm.php
+│   │   │   │       └── ApplicationShow.php
+│   │   │   ├── Services/
+│   │   │   │   ├── EmployeeService.php
+│   │   │   │   ├── LeaveService.php
+│   │   │   │   ├── ExpenseService.php
+│   │   │   │   ├── TimesheetService.php
+│   │   │   │   └── RecruitmentService.php
+│   │   │   ├── Policies/
+│   │   │   │   ├── EmployeePolicy.php
+│   │   │   │   ├── LeaveRequestPolicy.php
+│   │   │   │   ├── ExpenseReportPolicy.php
+│   │   │   │   ├── TimesheetPolicy.php
+│   │   │   │   └── JobPositionPolicy.php
+│   │   │   ├── Exports/
+│   │   │   │   ├── EmployeesExport.php
+│   │   │   │   ├── LeaveBalancesExport.php
+│   │   │   │   └── TimesheetsExport.php
+│   │   │   ├── Providers/
+│   │   │   │   └── HRServiceProvider.php
+│   │   │   └── routes.php
+│   │   │
+│   │   ├── Inventory/
+│   │   │   ├── Models/
+│   │   │   │   ├── ProductCategory.php
+│   │   │   │   ├── Product.php
+│   │   │   │   ├── Warehouse.php
+│   │   │   │   ├── StockLevel.php
+│   │   │   │   ├── StockMovement.php
+│   │   │   │   ├── PurchaseOrder.php
+│   │   │   │   └── PurchaseOrderLine.php
+│   │   │   ├── Livewire/
+│   │   │   │   ├── Products/
+│   │   │   │   │   ├── ProductsList.php
+│   │   │   │   │   ├── ProductForm.php
+│   │   │   │   │   ├── ProductShow.php
+│   │   │   │   │   └── CategoriesList.php
+│   │   │   │   ├── Stock/
+│   │   │   │   │   ├── StockDashboard.php
+│   │   │   │   │   ├── StockMovementForm.php
+│   │   │   │   │   └── StockHistory.php
+│   │   │   │   └── Purchases/
+│   │   │   │       ├── PurchaseOrdersList.php
+│   │   │   │       ├── PurchaseOrderForm.php
+│   │   │   │       ├── PurchaseOrderShow.php
+│   │   │   │       └── ReorderSuggestions.php
+│   │   │   ├── Services/
+│   │   │   │   ├── ProductService.php
+│   │   │   │   ├── StockService.php
+│   │   │   │   └── PurchaseOrderService.php
+│   │   │   ├── Policies/
+│   │   │   │   ├── ProductPolicy.php
+│   │   │   │   ├── StockPolicy.php
+│   │   │   │   └── PurchaseOrderPolicy.php
+│   │   │   ├── Exports/
+│   │   │   │   ├── ProductsExport.php
+│   │   │   │   └── StockExport.php
+│   │   │   ├── Providers/
+│   │   │   │   └── InventoryServiceProvider.php
+│   │   │   └── routes.php
+│   │   │
+│   │   ├── Finance/
+│   │   │   ├── Models/
+│   │   │   │   ├── Invoice.php
+│   │   │   │   ├── InvoiceLine.php
+│   │   │   │   ├── Payment.php
+│   │   │   │   └── PaymentReminder.php
+│   │   │   ├── Livewire/
+│   │   │   │   ├── Invoices/
+│   │   │   │   │   ├── InvoicesList.php
+│   │   │   │   │   ├── InvoiceForm.php
+│   │   │   │   │   ├── InvoiceShow.php
+│   │   │   │   │   └── InvoicePreview.php
+│   │   │   │   ├── Payments/
+│   │   │   │   │   ├── PaymentForm.php
+│   │   │   │   │   └── PaymentsList.php
+│   │   │   │   └── Reminders/
+│   │   │   │       └── RemindersList.php
+│   │   │   ├── Services/
+│   │   │   │   ├── InvoiceService.php
+│   │   │   │   ├── PaymentService.php
+│   │   │   │   └── ReminderService.php
+│   │   │   ├── Policies/
+│   │   │   │   ├── InvoicePolicy.php
+│   │   │   │   └── PaymentPolicy.php
+│   │   │   ├── Exports/
+│   │   │   │   └── InvoicesExport.php
+│   │   │   ├── Providers/
+│   │   │   │   └── FinanceServiceProvider.php
+│   │   │   └── routes.php
+│   │   │
+│   │   ├── Productivity/
+│   │   │   ├── Models/
+│   │   │   │   ├── Project.php
+│   │   │   │   ├── ProjectMember.php
+│   │   │   │   ├── Task.php
+│   │   │   │   └── TimeEntry.php
+│   │   │   ├── Livewire/
+│   │   │   │   ├── Projects/
+│   │   │   │   │   ├── ProjectsList.php
+│   │   │   │   │   ├── ProjectForm.php
+│   │   │   │   │   ├── ProjectShow.php
+│   │   │   │   │   └── ProjectStats.php
+│   │   │   │   ├── Tasks/
+│   │   │   │   │   ├── TasksKanban.php
+│   │   │   │   │   ├── TasksList.php
+│   │   │   │   │   ├── TaskModal.php
+│   │   │   │   │   ├── TaskShow.php
+│   │   │   │   │   └── TimeTracker.php
+│   │   │   │   └── Reports/
+│   │   │   │       └── ProductivityDashboard.php
+│   │   │   ├── Services/
+│   │   │   │   ├── ProjectService.php
+│   │   │   │   ├── TaskService.php
+│   │   │   │   └── ProjectStatsService.php
+│   │   │   ├── Policies/
+│   │   │   │   ├── ProjectPolicy.php
+│   │   │   │   └── TaskPolicy.php
+│   │   │   ├── Providers/
+│   │   │   │   └── ProductivityServiceProvider.php
+│   │   │   └── routes.php
+│   │   │
+│   │   └── Agenda/
+│   │       ├── Models/
+│   │       │   ├── Event.php
+│   │       │   ├── EventAttendee.php
+│   │       │   └── EventReminder.php
+│   │       ├── Livewire/
+│   │       │   ├── Calendar.php
+│   │       │   ├── EventModal.php
+│   │       │   └── EventShow.php
+│   │       ├── Services/
+│   │       │   └── EventService.php
+│   │       ├── Policies/
+│   │       │   └── EventPolicy.php
+│   │       ├── Providers/
+│   │       │   └── AgendaServiceProvider.php
+│   │       └── routes.php
+│   │
+│   ├── Notifications/
+│   │   ├── LeaveRequestSubmitted.php
+│   │   ├── LeaveRequestApproved.php
+│   │   ├── LeaveRequestRejected.php
+│   │   ├── ExpenseReportSubmitted.php
+│   │   ├── ExpenseReportApproved.php
+│   │   ├── ExpenseReportRejected.php
+│   │   ├── InvoiceOverdue.php
+│   │   ├── StockAlert.php
+│   │   ├── EventReminder.php
+│   │   ├── NewJobApplication.php
+│   │   └── TaskAssigned.php
+│   │
+│   ├── Exports/
+│   │   └── BaseExport.php
+│   │
+│   └── Providers/
+│       ├── AppServiceProvider.php
+│       ├── AuthServiceProvider.php
+│       └── ModuleServiceProvider.php
+│
+├── bootstrap/
+│   ├── app.php
+│   ├── cache/
+│   └── providers.php
+│
+├── config/
+│   ├── app.php
+│   ├── auth.php
+│   ├── database.php
+│   ├── filesystems.php
+│   ├── livewire.php
+│   ├── mail.php
+│   ├── modules.php
+│   ├── permission.php
+│   └── queue.php
+│
+├── database/
+│   ├── factories/
+│   │   ├── UserFactory.php
+│   │   ├── ContactFactory.php
+│   │   ├── OpportunityFactory.php
+│   │   ├── ProposalFactory.php
+│   │   ├── OrderFactory.php
+│   │   ├── ContractFactory.php
+│   │   ├── EmployeeFactory.php
+│   │   ├── LeaveRequestFactory.php
+│   │   ├── ExpenseReportFactory.php
+│   │   ├── ProductFactory.php
+│   │   ├── InvoiceFactory.php
+│   │   ├── ProjectFactory.php
+│   │   ├── TaskFactory.php
+│   │   └── EventFactory.php
+│   │
+│   ├── migrations/
+│   │   ├── 0001_01_01_000000_create_users_table.php
+│   │   ├── 0001_01_01_000001_create_cache_table.php
+│   │   ├── 0001_01_01_000002_create_jobs_table.php
+│   │   │
+│   │   │── Core/
+│   │   │   ├── 2024_01_01_000001_create_companies_table.php
+│   │   │   ├── 2024_01_01_000002_create_settings_table.php
+│   │   │   ├── 2024_01_01_000003_create_permission_tables.php
+│   │   │   └── 2024_01_01_000004_add_fields_to_users_table.php
+│   │   │
+│   │   │── CRM/
+│   │   │   ├── 2024_01_02_000001_create_contacts_table.php
+│   │   │   ├── 2024_01_02_000002_create_opportunity_stages_table.php
+│   │   │   ├── 2024_01_02_000003_create_opportunities_table.php
+│   │   │   ├── 2024_01_02_000004_create_proposals_table.php
+│   │   │   ├── 2024_01_02_000005_create_proposal_lines_table.php
+│   │   │   ├── 2024_01_02_000006_create_orders_table.php
+│   │   │   ├── 2024_01_02_000007_create_order_lines_table.php
+│   │   │   ├── 2024_01_02_000008_create_contracts_table.php
+│   │   │   └── 2024_01_02_000009_create_contract_lines_table.php
+│   │   │
+│   │   │── HR/
+│   │   │   ├── 2024_01_03_000001_create_departments_table.php
+│   │   │   ├── 2024_01_03_000002_create_employees_table.php
+│   │   │   ├── 2024_01_03_000003_create_leave_types_table.php
+│   │   │   ├── 2024_01_03_000004_create_leave_balances_table.php
+│   │   │   ├── 2024_01_03_000005_create_leave_requests_table.php
+│   │   │   ├── 2024_01_03_000006_create_expense_categories_table.php
+│   │   │   ├── 2024_01_03_000007_create_expense_reports_table.php
+│   │   │   ├── 2024_01_03_000008_create_expense_lines_table.php
+│   │   │   ├── 2024_01_03_000009_create_timesheets_table.php
+│   │   │   ├── 2024_01_03_000010_create_job_positions_table.php
+│   │   │   └── 2024_01_03_000011_create_job_applications_table.php
+│   │   │
+│   │   │── Inventory/
+│   │   │   ├── 2024_01_04_000001_create_product_categories_table.php
+│   │   │   ├── 2024_01_04_000002_create_products_table.php
+│   │   │   ├── 2024_01_04_000003_create_warehouses_table.php
+│   │   │   ├── 2024_01_04_000004_create_stock_levels_table.php
+│   │   │   ├── 2024_01_04_000005_create_stock_movements_table.php
+│   │   │   ├── 2024_01_04_000006_create_purchase_orders_table.php
+│   │   │   └── 2024_01_04_000007_create_purchase_order_lines_table.php
+│   │   │
+│   │   │── Finance/
+│   │   │   ├── 2024_01_05_000001_create_invoices_table.php
+│   │   │   ├── 2024_01_05_000002_create_invoice_lines_table.php
+│   │   │   ├── 2024_01_05_000003_create_payments_table.php
+│   │   │   └── 2024_01_05_000004_create_payment_reminders_table.php
+│   │   │
+│   │   │── Productivity/
+│   │   │   ├── 2024_01_06_000001_create_projects_table.php
+│   │   │   ├── 2024_01_06_000002_create_project_members_table.php
+│   │   │   ├── 2024_01_06_000003_create_tasks_table.php
+│   │   │   └── 2024_01_06_000004_create_time_entries_table.php
+│   │   │
+│   │   └── Agenda/
+│   │       ├── 2024_01_07_000001_create_events_table.php
+│   │       ├── 2024_01_07_000002_create_event_attendees_table.php
+│   │       └── 2024_01_07_000003_create_event_reminders_table.php
+│   │
+│   └── seeders/
+│       ├── DatabaseSeeder.php
+│       ├── CompanySeeder.php
+│       ├── SettingsSeeder.php
+│       ├── RolePermissionSeeder.php
+│       ├── DepartmentSeeder.php
+│       ├── OpportunityStageSeeder.php
+│       ├── LeaveTypeSeeder.php
+│       ├── ExpenseCategorySeeder.php
+│       ├── ProductCategorySeeder.php
+│       ├── WarehouseSeeder.php
+│       └── DemoDataSeeder.php
+│
+├── public/
+│   ├── index.php
+│   ├── favicon.ico
+│   └── build/
+│
+├── resources/
+│   ├── css/
+│   │   └── app.css
+│   │
+│   ├── js/
+│   │   ├── app.js
+│   │   └── alpine-components/
+│   │       ├── sortable.js
+│   │       ├── calendar.js
+│   │       ├── time-tracker.js
+│   │       └── charts.js
+│   │
+│   └── views/
+│       ├── components/
+│       │   ├── layouts/
+│       │   │   ├── app.blade.php
+│       │   │   ├── guest.blade.php
+│       │   │   └── partials/
+│       │   │       ├── sidebar.blade.php
+│       │   │       ├── header.blade.php
+│       │   │       └── footer.blade.php
+│       │   │
+│       │   └── ui/
+│       │       ├── card.blade.php
+│       │       ├── button.blade.php
+│       │       ├── badge.blade.php
+│       │       ├── modal.blade.php
+│       │       ├── table.blade.php
+│       │       ├── input.blade.php
+│       │       ├── select.blade.php
+│       │       ├── textarea.blade.php
+│       │       ├── dropdown.blade.php
+│       │       ├── alert.blade.php
+│       │       ├── pagination.blade.php
+│       │       ├── stats-card.blade.php
+│       │       ├── tabs.blade.php
+│       │       ├── timeline.blade.php
+│       │       └── empty-state.blade.php
+│       │
+│       ├── livewire/
+│       │   ├── core/
+│       │   │   ├── dashboard.blade.php
+│       │   │   ├── global-search.blade.php
+│       │   │   ├── notification-dropdown.blade.php
+│       │   │   ├── notifications-list.blade.php
+│       │   │   ├── user-management.blade.php
+│       │   │   ├── user-form.blade.php
+│       │   │   ├── role-permissions.blade.php
+│       │   │   └── settings.blade.php
+│       │   │
+│       │   ├── crm/
+│       │   │   ├── contacts/
+│       │   │   │   ├── contacts-list.blade.php
+│       │   │   │   ├── contact-form.blade.php
+│       │   │   │   └── contact-show.blade.php
+│       │   │   ├── opportunities/
+│       │   │   │   ├── opportunity-pipeline.blade.php
+│       │   │   │   ├── opportunity-form.blade.php
+│       │   │   │   └── opportunity-show.blade.php
+│       │   │   ├── proposals/
+│       │   │   │   ├── proposals-list.blade.php
+│       │   │   │   ├── proposal-builder.blade.php
+│       │   │   │   └── proposal-show.blade.php
+│       │   │   ├── orders/
+│       │   │   │   ├── orders-list.blade.php
+│       │   │   │   ├── order-form.blade.php
+│       │   │   │   └── order-show.blade.php
+│       │   │   └── contracts/
+│       │   │       ├── contracts-list.blade.php
+│       │   │       ├── contract-form.blade.php
+│       │   │       └── contract-show.blade.php
+│       │   │
+│       │   ├── hr/
+│       │   │   ├── employees/
+│       │   │   │   ├── employees-list.blade.php
+│       │   │   │   ├── employee-form.blade.php
+│       │   │   │   ├── employee-show.blade.php
+│       │   │   │   └── org-chart.blade.php
+│       │   │   ├── leaves/
+│       │   │   │   ├── leave-balances.blade.php
+│       │   │   │   ├── leave-request-form.blade.php
+│       │   │   │   ├── leave-requests-list.blade.php
+│       │   │   │   ├── leave-calendar.blade.php
+│       │   │   │   └── leave-approval.blade.php
+│       │   │   ├── expenses/
+│       │   │   │   ├── expense-reports-list.blade.php
+│       │   │   │   ├── expense-report-form.blade.php
+│       │   │   │   ├── expense-report-show.blade.php
+│       │   │   │   └── expense-approval.blade.php
+│       │   │   ├── timesheets/
+│       │   │   │   ├── timesheet-weekly.blade.php
+│       │   │   │   ├── timesheet-daily.blade.php
+│       │   │   │   └── timesheet-report.blade.php
+│       │   │   └── recruitment/
+│       │   │       ├── job-positions-list.blade.php
+│       │   │       ├── job-position-form.blade.php
+│       │   │       ├── job-position-show.blade.php
+│       │   │       ├── applications-kanban.blade.php
+│       │   │       ├── application-form.blade.php
+│       │   │       └── application-show.blade.php
+│       │   │
+│       │   ├── inventory/
+│       │   │   ├── products/
+│       │   │   │   ├── products-list.blade.php
+│       │   │   │   ├── product-form.blade.php
+│       │   │   │   ├── product-show.blade.php
+│       │   │   │   └── categories-list.blade.php
+│       │   │   ├── stock/
+│       │   │   │   ├── stock-dashboard.blade.php
+│       │   │   │   ├── stock-movement-form.blade.php
+│       │   │   │   └── stock-history.blade.php
+│       │   │   └── purchases/
+│       │   │       ├── purchase-orders-list.blade.php
+│       │   │       ├── purchase-order-form.blade.php
+│       │   │       ├── purchase-order-show.blade.php
+│       │   │       └── reorder-suggestions.blade.php
+│       │   │
+│       │   ├── finance/
+│       │   │   ├── invoices/
+│       │   │   │   ├── invoices-list.blade.php
+│       │   │   │   ├── invoice-form.blade.php
+│       │   │   │   ├── invoice-show.blade.php
+│       │   │   │   └── invoice-preview.blade.php
+│       │   │   ├── payments/
+│       │   │   │   ├── payment-form.blade.php
+│       │   │   │   └── payments-list.blade.php
+│       │   │   └── reminders/
+│       │   │       └── reminders-list.blade.php
+│       │   │
+│       │   ├── productivity/
+│       │   │   ├── projects/
+│       │   │   │   ├── projects-list.blade.php
+│       │   │   │   ├── project-form.blade.php
+│       │   │   │   ├── project-show.blade.php
+│       │   │   │   └── project-stats.blade.php
+│       │   │   ├── tasks/
+│       │   │   │   ├── tasks-kanban.blade.php
+│       │   │   │   ├── tasks-list.blade.php
+│       │   │   │   ├── task-modal.blade.php
+│       │   │   │   ├── task-show.blade.php
+│       │   │   │   └── time-tracker.blade.php
+│       │   │   └── reports/
+│       │   │       └── productivity-dashboard.blade.php
+│       │   │
+│       │   └── agenda/
+│       │       ├── calendar.blade.php
+│       │       ├── event-modal.blade.php
+│       │       └── event-show.blade.php
+│       │
+│       ├── pdf/
+│       │   ├── proposal.blade.php
+│       │   ├── invoice.blade.php
+│       │   ├── purchase-order.blade.php
+│       │   └── partials/
+│       │       ├── header.blade.php
+│       │       ├── footer.blade.php
+│       │       └── company-info.blade.php
+│       │
+│       ├── emails/
+│       │   ├── proposal-sent.blade.php
+│       │   ├── invoice-sent.blade.php
+│       │   ├── reminders/
+│       │   │   ├── first.blade.php
+│       │   │   ├── second.blade.php
+│       │   │   └── final.blade.php
+│       │   ├── leaves/
+│       │   │   ├── request-submitted.blade.php
+│       │   │   ├── request-approved.blade.php
+│       │   │   └── request-rejected.blade.php
+│       │   ├── expenses/
+│       │   │   ├── report-submitted.blade.php
+│       │   │   ├── report-approved.blade.php
+│       │   │   └── report-rejected.blade.php
+│       │   ├── recruitment/
+│       │   │   ├── application-received.blade.php
+│       │   │   └── new-application.blade.php
+│       │   ├── event-reminder.blade.php
+│       │   └── stock-alert.blade.php
+│       │
+│       ├── auth/
+│       │   ├── login.blade.php
+│       │   ├── register.blade.php
+│       │   ├── forgot-password.blade.php
+│       │   └── reset-password.blade.php
+│       │
+│       └── careers/
+│           ├── index.blade.php
+│           ├── show.blade.php
+│           └── apply.blade.php
+│
+├── routes/
+│   ├── web.php
+│   ├── api.php
+│   ├── console.php
+│   └── channels.php
+│
+├── storage/
+│   ├── app/
+│   │   ├── private/
+│   │   │   ├── expenses/
+│   │   │   └── applications/
+│   │   └── public/
+│   │       ├── avatars/
+│   │       ├── logos/
+│   │       ├── proposals/
+│   │       ├── invoices/
+│   │       └── purchase-orders/
+│   ├── framework/
+│   └── logs/
+│
+├── tests/
+│   ├── Unit/
+│   │   ├── Services/
+│   │   │   ├── InvoiceServiceTest.php
+│   │   │   ├── StockServiceTest.php
+│   │   │   ├── LeaveServiceTest.php
+│   │   │   ├── OrderServiceTest.php
+│   │   │   └── ContractServiceTest.php
+│   │   └── Models/
+│   │       ├── ContactTest.php
+│   │       ├── InvoiceTest.php
+│   │       └── ProjectTest.php
+│   │
+│   ├── Feature/
+│   │   ├── Auth/
+│   │   │   └── AuthenticationTest.php
+│   │   ├── CRM/
+│   │   │   ├── ContactsCrudTest.php
+│   │   │   ├── OpportunitiesTest.php
+│   │   │   └── OrdersWorkflowTest.php
+│   │   ├── HR/
+│   │   │   ├── LeaveRequestWorkflowTest.php
+│   │   │   └── ExpenseWorkflowTest.php
+│   │   ├── Finance/
+│   │   │   └── InvoiceWorkflowTest.php
+│   │   └── Inventory/
+│   │       └── StockMovementTest.php
+│   │
+│   └── Pest.php
+│
+├── docs/
+│   ├── README.md
+│   ├── ARCHITECTURE.md
+│   ├── API.md
+│   ├── DEPLOYMENT.md
+│   └── CHANGELOG.md
+│
+├── .env.example
+├── .gitignore
+├── artisan
+├── composer.json
+├── package.json
+├── tailwind.config.js
+├── vite.config.js
+└── phpunit.xml
+```
+
+## Résumé de la structure
+
+| Dossier | Contenu |
+|---------|---------|
+| `app/Modules/` | 7 modules métier (Core, CRM, HR, Inventory, Finance, Productivity, Agenda) |
+| `app/Console/Commands/` | 6 commandes Artisan planifiées |
+| `app/Notifications/` | 11 types de notifications |
+| `database/migrations/` | ~40 migrations organisées par module |
+| `database/seeders/` | 11 seeders incluant données démo |
+| `resources/views/livewire/` | ~65 vues Livewire |
+| `resources/views/components/ui/` | 15 composants UI réutilisables |
+| `resources/views/pdf/` | 3 templates PDF |
+| `resources/views/emails/` | 12 templates email |
+| `tests/` | Tests unitaires et fonctionnels |
+
+## Fichiers clés à créer en priorité
+
+1. `config/modules.php` : Liste des modules actifs
+2. `app/Providers/ModuleServiceProvider.php` : Chargement automatique des modules
+3. `app/Helpers/helpers.php` : Fonction `setting()` globale
+4. `resources/views/components/layouts/app.blade.php` : Layout principal
+5. Chaque `{Module}ServiceProvider.php` : Enregistrement routes et bindings
