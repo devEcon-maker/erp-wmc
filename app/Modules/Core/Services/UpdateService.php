@@ -281,9 +281,13 @@ class UpdateService
             Artisan::call('view:clear');
             Artisan::call('route:clear');
 
-            // 8. Mettre à jour composer si nécessaire
+            // 8. Réinstaller les dépendances composer
             if (File::exists(base_path('composer.json'))) {
-                exec('cd ' . base_path() . ' && composer install --no-dev --optimize-autoloader 2>&1', $output);
+                Log::info('Réinstallation des dépendances composer...');
+                $composerOutput = [];
+                $composerReturn = 0;
+                exec('cd ' . escapeshellarg(base_path()) . ' && composer install --no-dev --optimize-autoloader 2>&1', $composerOutput, $composerReturn);
+                Log::info('Composer install terminé avec code: ' . $composerReturn);
             }
 
             // 9. Nettoyer les fichiers temporaires
@@ -317,30 +321,48 @@ class UpdateService
      */
     protected function copyUpdateFiles(string $sourcePath): void
     {
-        $excludeFiles = [
-            '.env',
-            '.env.example',
+        // Dossiers à exclure complètement
+        $excludeDirs = [
             'storage',
             '.git',
             'node_modules',
             'vendor',
         ];
 
-        // Trouver le répertoire racine dans le ZIP (GitHub ajoute un préfixe)
+        // Fichiers spécifiques à exclure
+        $excludeFiles = [
+            '.env',
+            '.env.local',
+            'composer.lock',
+        ];
+
+        // Trouver le répertoire racine dans le ZIP (GitHub ajoute un préfixe comme "repo-main/")
         $directories = File::directories($sourcePath);
         $sourceRoot = count($directories) === 1 ? $directories[0] : $sourcePath;
 
         $files = File::allFiles($sourceRoot);
+        $copiedCount = 0;
 
         foreach ($files as $file) {
-            $relativePath = str_replace($sourceRoot . '/', '', $file->getPathname());
+            $relativePath = str_replace($sourceRoot . DIRECTORY_SEPARATOR, '', $file->getPathname());
+            $relativePath = str_replace('\\', '/', $relativePath); // Normaliser les séparateurs
 
-            // Vérifier si le fichier doit être exclu
+            // Vérifier si le fichier est dans un dossier exclu
             $shouldExclude = false;
-            foreach ($excludeFiles as $exclude) {
-                if (str_starts_with($relativePath, $exclude)) {
+            foreach ($excludeDirs as $excludeDir) {
+                if (str_starts_with($relativePath, $excludeDir . '/') || $relativePath === $excludeDir) {
                     $shouldExclude = true;
                     break;
+                }
+            }
+
+            // Vérifier si c'est un fichier spécifique à exclure
+            if (!$shouldExclude) {
+                foreach ($excludeFiles as $excludeFile) {
+                    if ($relativePath === $excludeFile) {
+                        $shouldExclude = true;
+                        break;
+                    }
                 }
             }
 
@@ -353,8 +375,11 @@ class UpdateService
                 }
 
                 File::copy($file->getPathname(), $destination);
+                $copiedCount++;
             }
         }
+
+        Log::info("Update: {$copiedCount} fichiers copiés");
     }
 
     /**
@@ -509,6 +534,8 @@ class UpdateService
                 ];
             }
 
+            Log::info('Début de la mise à jour manuelle depuis: ' . $filePath);
+
             // 1. Mettre l'application en mode maintenance
             Artisan::call('down', ['--retry' => 60]);
 
@@ -527,35 +554,51 @@ class UpdateService
             $zip->extractTo($extractPath);
             $zip->close();
 
-            // 3. Vérifier la présence d'un version.json dans le ZIP
+            Log::info('Fichiers extraits vers: ' . $extractPath);
+
+            // 3. Copier les fichiers de mise à jour
             $this->copyUpdateFiles($extractPath);
 
-            // 4. Exécuter les migrations
-            Artisan::call('migrate', ['--force' => true]);
+            // 4. Vérifier si composer.json a été mis à jour et réinstaller les dépendances
+            if (File::exists(base_path('composer.json'))) {
+                Log::info('Réinstallation des dépendances composer...');
+                $composerOutput = [];
+                $composerReturn = 0;
+                exec('cd ' . escapeshellarg(base_path()) . ' && composer install --no-dev --optimize-autoloader 2>&1', $composerOutput, $composerReturn);
+                Log::info('Composer install terminé avec code: ' . $composerReturn);
+                if ($composerReturn !== 0) {
+                    Log::warning('Composer install output: ' . implode("\n", $composerOutput));
+                }
+            }
 
-            // 5. Vider les caches
+            // 5. Exécuter les migrations
+            Artisan::call('migrate', ['--force' => true]);
+            Log::info('Migrations exécutées');
+
+            // 6. Vider les caches
             Artisan::call('config:clear');
             Artisan::call('cache:clear');
             Artisan::call('view:clear');
             Artisan::call('route:clear');
 
-            // 6. Optimiser si en production
+            // 7. Optimiser si en production
             if (app()->environment('production')) {
                 Artisan::call('config:cache');
                 Artisan::call('route:cache');
                 Artisan::call('view:cache');
             }
 
-            // 7. Nettoyer les fichiers temporaires
+            // 8. Nettoyer les fichiers temporaires
             File::deleteDirectory($extractPath);
 
-            // 8. Sortir du mode maintenance
+            // 9. Sortir du mode maintenance
             Artisan::call('up');
 
-            // 9. Enregistrer la mise à jour
-            $this->logUpdate();
+            // 10. Enregistrer la mise à jour
+            $this->logUpdate('Mise à jour manuelle via upload');
 
             $newVersion = $this->getCurrentVersion();
+            Log::info('Mise à jour terminée vers: v' . $newVersion['version']);
 
             return [
                 'success' => true,
@@ -564,7 +607,7 @@ class UpdateService
             ];
         } catch (\Exception $e) {
             Artisan::call('up');
-            Log::error('Manual update failed: ' . $e->getMessage());
+            Log::error('Manual update failed: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
 
             return [
                 'success' => false,
