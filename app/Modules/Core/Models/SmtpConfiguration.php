@@ -112,86 +112,37 @@ class SmtpConfiguration extends Model
     public function testConnection(): array
     {
         try {
-            // Utiliser fsockopen pour un test de connexion rapide
-            $timeout = 10;
-            $port = $this->port;
-            $host = $this->host;
-
-            // Pour SSL, ajouter le prefixe ssl://
+            // Utiliser Symfony Mailer pour un test de connexion fiable
             if ($this->encryption === 'ssl') {
-                $host = 'ssl://' . $host;
+                // Pour SSL (port 465), utiliser smtps://
+                $dsn = sprintf(
+                    'smtps://%s:%s@%s:%d',
+                    urlencode($this->username),
+                    urlencode($this->decrypted_password),
+                    $this->host,
+                    $this->port
+                );
+            } else {
+                // Pour TLS (port 587) ou sans encryption
+                $scheme = $this->encryption === 'tls' ? 'smtp' : 'smtp';
+                $dsn = sprintf(
+                    '%s://%s:%s@%s:%d',
+                    $scheme,
+                    urlencode($this->username),
+                    urlencode($this->decrypted_password),
+                    $this->host,
+                    $this->port
+                );
             }
 
-            $errno = 0;
-            $errstr = '';
-            $connection = @fsockopen($host, $port, $errno, $errstr, $timeout);
+            $transport = \Symfony\Component\Mailer\Transport::fromDsn($dsn);
 
-            if (!$connection) {
-                throw new \Exception("Impossible de se connecter au serveur: $errstr ($errno)");
+            // Tester la connexion en créant le transport
+            // Pour EsmtpTransport, on peut vérifier la connexion
+            if ($transport instanceof \Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport) {
+                $transport->start();
+                $transport->stop();
             }
-
-            // Lire la reponse initiale du serveur
-            $response = fgets($connection, 512);
-            if (strpos($response, '220') === false) {
-                fclose($connection);
-                throw new \Exception("Reponse inattendue du serveur: $response");
-            }
-
-            // Envoyer EHLO
-            fwrite($connection, "EHLO " . gethostname() . "\r\n");
-            $response = '';
-            while ($line = fgets($connection, 512)) {
-                $response .= $line;
-                if (substr($line, 3, 1) === ' ') break;
-            }
-
-            // Pour TLS, negocier STARTTLS
-            if ($this->encryption === 'tls') {
-                fwrite($connection, "STARTTLS\r\n");
-                $tlsResponse = fgets($connection, 512);
-                if (strpos($tlsResponse, '220') === false) {
-                    fclose($connection);
-                    throw new \Exception("STARTTLS echoue: $tlsResponse");
-                }
-
-                // Activer le chiffrement TLS
-                if (!stream_socket_enable_crypto($connection, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
-                    fclose($connection);
-                    throw new \Exception("Echec de l'activation TLS");
-                }
-
-                // Re-envoyer EHLO apres TLS
-                fwrite($connection, "EHLO " . gethostname() . "\r\n");
-                $response = '';
-                while ($line = fgets($connection, 512)) {
-                    $response .= $line;
-                    if (substr($line, 3, 1) === ' ') break;
-                }
-            }
-
-            // Tester l'authentification
-            fwrite($connection, "AUTH LOGIN\r\n");
-            $authResponse = fgets($connection, 512);
-            if (strpos($authResponse, '334') !== false) {
-                // Envoyer username
-                fwrite($connection, base64_encode($this->username) . "\r\n");
-                $userResponse = fgets($connection, 512);
-
-                if (strpos($userResponse, '334') !== false) {
-                    // Envoyer password
-                    fwrite($connection, base64_encode($this->decrypted_password) . "\r\n");
-                    $passResponse = fgets($connection, 512);
-
-                    if (strpos($passResponse, '235') === false && strpos($passResponse, '2') !== 0) {
-                        fclose($connection);
-                        throw new \Exception("Authentification echouee: identifiants incorrects");
-                    }
-                }
-            }
-
-            // Fermer proprement
-            fwrite($connection, "QUIT\r\n");
-            fclose($connection);
 
             $this->update([
                 'last_tested_at' => now(),
@@ -221,15 +172,9 @@ class SmtpConfiguration extends Model
     public function sendTestEmail(string $toEmail): array
     {
         try {
-            // Créer un transport SMTP personnalisé pour ce test
-            $transport = new \Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport(
-                $this->host,
-                $this->port,
-                $this->encryption === 'tls'
-            );
-
-            // Pour SSL sur le port 465, utiliser une connexion sécurisée native
+            // Construire le DSN selon le type d'encryption
             if ($this->encryption === 'ssl') {
+                // Pour SSL (port 465), utiliser smtps://
                 $dsn = sprintf(
                     'smtps://%s:%s@%s:%d',
                     urlencode($this->username),
@@ -237,12 +182,19 @@ class SmtpConfiguration extends Model
                     $this->host,
                     $this->port
                 );
-                $transport = \Symfony\Component\Mailer\Transport::fromDsn($dsn);
             } else {
-                // Pour TLS ou sans encryption
-                $transport->setUsername($this->username);
-                $transport->setPassword($this->decrypted_password);
+                // Pour TLS (port 587) ou sans encryption
+                $dsn = sprintf(
+                    'smtp://%s:%s@%s:%d',
+                    urlencode($this->username),
+                    urlencode($this->decrypted_password),
+                    $this->host,
+                    $this->port
+                );
             }
+
+            // Créer le transport via DSN
+            $transport = \Symfony\Component\Mailer\Transport::fromDsn($dsn);
 
             // Créer le mailer Symfony
             $mailer = new \Symfony\Component\Mailer\Mailer($transport);
