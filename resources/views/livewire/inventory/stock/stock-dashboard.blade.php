@@ -74,23 +74,27 @@
                 <tbody class="divide-y divide-[#3a2e24]">
                     @forelse($products as $product)
                         @php
+                            // Utiliser current_stock calculé à partir des mouvements
+                            $qty = $product->current_stock ?? 0;
+
+                            // Pour la compatibilité, garder aussi les stockLevels si présents
                             $level = $product->stockLevels->first();
-                            $qty = $level ? $level->quantity : 0;
                             $reserved = $level ? $level->reserved_quantity : 0;
                             $available = $qty - $reserved;
-                            $isAlert = $qty <= $product->min_stock_alert;
+                            $isAlert = $qty <= ($product->min_stock_alert ?? 0);
                         @endphp
                         <tr class="hover:bg-surface-highlight/50 transition-colors">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">{{ $product->reference }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $product->name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-white">{{ $qty }}
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-white">
+                                {{ number_format($qty, 0) }} <span class="text-xs text-text-secondary">{{ $product->unit }}</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-text-secondary">{{ $reserved }}
                             </td>
                             <td
                                 class="px-6 py-4 whitespace-nowrap text-sm text-right font-bold {{ $available <= 0 ? 'text-red-500' : 'text-green-500' }}">
-                                {{ $available }}
+                                {{ number_format($available, 0) }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 @if($isAlert)
@@ -106,8 +110,7 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button
-                                    wire:click="$dispatch('openModal', { component: 'inventory.product-show', arguments: { product: {{ $product->id }} } })"
+                                <button type="button" x-data x-on:click="$dispatch('open-quick-view', {{ $product->id }})"
                                     class="text-primary hover:text-primary-hover font-bold transition-colors">Voir</button>
                             </td>
                         </tr>
@@ -125,4 +128,7 @@
             </div>
         @endif
     </div>
+
+    <!-- Modals -->
+    <livewire:inventory.stock.product-quick-view />
 </div>

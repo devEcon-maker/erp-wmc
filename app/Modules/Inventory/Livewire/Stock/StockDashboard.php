@@ -32,27 +32,14 @@ class StockDashboard extends Component
 
     public function getStatsProperty()
     {
-        // Global stats across all warehouses or selected one? Prompt says "Overview".
-        // Let's filter by selected warehouse if possible, or global?
-        // Usually dashboards are global or per context. Let's do selected warehouse context.
+        // Compter les produits en alerte (utiliser current_stock calculé)
+        $products = Product::where('is_active', true)
+            ->where('track_stock', true)
+            ->get();
 
-        $query = StockLevel::query();
-        if ($this->warehouseId) {
-            $query->where('warehouse_id', $this->warehouseId);
-        }
-
-        $totalValue = 0; // Need product cost/price.
-        // Assuming we calculate value based on current quantity * purchase_price
-        // This is heavy. Let's do approximate or simpler.
-        // Or aggregate from DB.
-
-        $productsInAlert = Product::where('is_active', true)
-            ->whereHas('stockLevels', function ($q) {
-                if ($this->warehouseId)
-                    $q->where('warehouse_id', $this->warehouseId)->whereRaw('quantity <= products.min_stock_alert');
-                else
-                    $q->whereRaw('quantity <= products.min_stock_alert');
-            })->count();
+        $productsInAlert = $products->filter(function ($product) {
+            return ($product->current_stock ?? 0) <= ($product->min_stock_alert ?? 0);
+        })->count();
 
         $movementsToday = StockMovement::whereDate('created_at', today())
             ->when($this->warehouseId, fn($q) => $q->where('warehouse_id', $this->warehouseId))

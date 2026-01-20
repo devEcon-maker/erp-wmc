@@ -7,6 +7,7 @@ use Livewire\Livewire;
 use App\Modules\Inventory\Livewire\Stock\StockDashboard;
 use App\Modules\Inventory\Livewire\Stock\StockHistory;
 use App\Modules\Inventory\Livewire\Stock\StockMovementForm;
+use App\Modules\Inventory\Livewire\Stock\ProductQuickView;
 use App\Modules\Inventory\Livewire\ProductsList;
 use App\Modules\Inventory\Livewire\ProductForm;
 use App\Modules\Inventory\Livewire\ProductShow;
@@ -22,6 +23,7 @@ class InventoryServiceProvider extends ServiceProvider
         Livewire::component('inventory.stock.stock-dashboard', StockDashboard::class);
         Livewire::component('inventory.stock.stock-history', StockHistory::class);
         Livewire::component('inventory.stock.stock-movement-form', StockMovementForm::class);
+        Livewire::component('inventory.stock.product-quick-view', ProductQuickView::class);
 
         Livewire::component('inventory.products-list', ProductsList::class);
         Livewire::component('inventory.product-form', ProductForm::class);
