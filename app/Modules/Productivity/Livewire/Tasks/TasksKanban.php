@@ -120,7 +120,7 @@ class TasksKanban extends Component
         $this->taskForm = [
             'title' => '',
             'description' => '',
-            'assigned_to' => '',
+            'assigned_to' => $this->project?->manager_id ?? '',
             'priority' => 'medium',
             'due_date' => '',
             'estimated_hours' => '',

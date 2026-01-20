@@ -1,6 +1,7 @@
 <div class="space-y-6">
     <!-- Header -->
-    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-surface-dark border border-[#3a2e24] p-6 rounded-2xl">
+    <div
+        class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-surface-dark border border-[#3a2e24] p-6 rounded-2xl">
         <div class="flex items-center gap-4">
             <a href="{{ route('productivity.projects.show', $project) }}"
                 class="p-2 text-text-secondary hover:text-white hover:bg-surface-highlight rounded-lg transition-colors">
@@ -12,7 +13,8 @@
             </div>
         </div>
         <div class="flex gap-2">
-            <button wire:click="openTaskModal('todo')" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/80 flex items-center gap-2">
+            <button wire:click="openTaskModal('todo')"
+                class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/80 flex items-center gap-2">
                 <span class="material-symbols-outlined text-[20px]">add</span>
                 Nouvelle tâche
             </button>
@@ -66,8 +68,7 @@
                             ];
                         @endphp
                         <div class="bg-surface-highlight border border-[#3a2e24] rounded-lg p-4 cursor-grab hover:border-primary/50 transition-all group"
-                            draggable="true"
-                            x-on:dragstart="$event.dataTransfer.setData('taskId', {{ $task->id }})">
+                            draggable="true" x-on:dragstart="$event.dataTransfer.setData('taskId', {{ $task->id }})">
 
                             <!-- Task Header -->
                             <div class="flex justify-between items-start gap-2">
@@ -111,7 +112,8 @@
                             <div class="flex justify-between items-center mt-3 pt-3 border-t border-[#3a2e24]">
                                 @if($task->assignee)
                                     <div class="flex items-center gap-2">
-                                        <div class="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-xs font-medium text-primary">
+                                        <div
+                                            class="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-xs font-medium text-primary">
                                             {{ substr($task->assignee->first_name, 0, 1) }}{{ substr($task->assignee->last_name, 0, 1) }}
                                         </div>
                                         <span class="text-xs text-text-secondary">{{ $task->assignee->first_name }}</span>
@@ -130,8 +132,7 @@
                                         class="p-1 text-text-secondary hover:text-white rounded">
                                         <span class="material-symbols-outlined text-[16px]">content_copy</span>
                                     </button>
-                                    <button wire:click="deleteTask({{ $task->id }})"
-                                        wire:confirm="Supprimer cette tâche ?"
+                                    <button wire:click="deleteTask({{ $task->id }})" wire:confirm="Supprimer cette tâche ?"
                                         class="p-1 text-red-400 hover:text-red-300 rounded">
                                         <span class="material-symbols-outlined text-[16px]">delete</span>
                                     </button>
@@ -166,25 +167,24 @@
                 </h3>
 
                 <div class="space-y-4">
-                    <x-ui.input
-                        label="Titre *"
-                        wire:model="taskForm.title"
-                        placeholder="Titre de la tâche"
-                        :error="$errors->first('taskForm.title')"
-                    />
+                    <x-ui.input label="Titre *" wire:model="taskForm.title" placeholder="Titre de la tâche"
+                        :error="$errors->first('taskForm.title')" />
 
-                    <x-ui.textarea
-                        label="Description"
-                        wire:model="taskForm.description"
-                        placeholder="Description..."
-                        rows="3"
-                    />
+                    <x-ui.textarea label="Description" wire:model="taskForm.description" placeholder="Description..."
+                        rows="3" />
 
                     <div class="grid grid-cols-2 gap-4">
                         <x-ui.select label="Assigné à" wire:model="taskForm.assigned_to">
                             <option value="">Non assigné</option>
+                            <option value="">Non assigné</option>
+                            @if($project->manager)
+                                <option value="{{ $project->manager->id }}">{{ $project->manager->full_name }} (Manager)
+                                </option>
+                            @endif
                             @foreach($project->members as $member)
-                                <option value="{{ $member->id }}">{{ $member->full_name }}</option>
+                                @if($project->manager_id !== $member->id)
+                                    <option value="{{ $member->id }}">{{ $member->full_name }}</option>
+                                @endif
                             @endforeach
                         </x-ui.select>
 
@@ -197,19 +197,10 @@
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
-                        <x-ui.input
-                            type="date"
-                            label="Date d'échéance"
-                            wire:model="taskForm.due_date"
-                        />
+                        <x-ui.input type="date" label="Date d'échéance" wire:model="taskForm.due_date" />
 
-                        <x-ui.input
-                            type="number"
-                            step="0.5"
-                            label="Heures estimées"
-                            wire:model="taskForm.estimated_hours"
-                            placeholder="0"
-                        />
+                        <x-ui.input type="number" step="0.5" label="Heures estimées" wire:model="taskForm.estimated_hours"
+                            placeholder="0" />
                     </div>
 
                     <x-ui.select label="Statut" wire:model="taskForm.status">

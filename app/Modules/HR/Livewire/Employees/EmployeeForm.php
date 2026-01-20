@@ -112,6 +112,25 @@ class EmployeeForm extends Component
         ];
     }
 
+    public function messages()
+    {
+        return [
+            'email.unique' => 'Cet email est déjà utilisé par un autre utilisateur. Si vous souhaitez lier cet employé à un compte utilisateur existant, utilisez l\'option "Lier à un utilisateur existant" ci-dessous.',
+            'email.required' => 'L\'adresse email est obligatoire.',
+            'email.email' => 'L\'adresse email doit être valide.',
+            'first_name.required' => 'Le prénom est obligatoire.',
+            'last_name.required' => 'Le nom est obligatoire.',
+            'hire_date.required' => 'La date d\'embauche est obligatoire.',
+            'job_title.required' => 'Le poste est obligatoire.',
+            'department_id.required' => 'Le département est obligatoire.',
+            'department_id.exists' => 'Le département sélectionné n\'existe pas.',
+            'manager_id.exists' => 'Le responsable sélectionné n\'existe pas.',
+            'end_date.after_or_equal' => 'La date de fin doit être postérieure ou égale à la date d\'embauche.',
+            'salary.numeric' => 'Le salaire doit être un nombre.',
+            'salary.min' => 'Le salaire doit être supérieur ou égal à 0.',
+        ];
+    }
+
     public function save()
     {
         $this->validate();
@@ -160,17 +179,31 @@ class EmployeeForm extends Component
             $this->employee = $employee;
 
             if ($this->user_action === 'create') {
-                // Create a new user account
-                $user = User::create([
-                    'name' => $data['first_name'] . ' ' . $data['last_name'],
-                    'email' => $data['email'],
-                    'password' => bcrypt('password'), // Default password - should be changed
-                ]);
-                // Assign default employee role
-                $user->assignRole('employe');
+                // Check if user already exists with this email
+                $existingUser = User::where('email', $data['email'])->first();
 
-                $employee->user_id = $user->id;
-                $employee->save();
+                if ($existingUser) {
+                    // Link existing user to employee
+                    $employee->user_id = $existingUser->id;
+                    $employee->save();
+
+                    // Ensure user has employee role
+                    if (!$existingUser->hasRole('employe')) {
+                        $existingUser->assignRole('employe');
+                    }
+                } else {
+                    // Create a new user account
+                    $user = User::create([
+                        'name' => $data['first_name'] . ' ' . $data['last_name'],
+                        'email' => $data['email'],
+                        'password' => bcrypt('password'), // Default password - should be changed
+                    ]);
+                    // Assign default employee role
+                    $user->assignRole('employe');
+
+                    $employee->user_id = $user->id;
+                    $employee->save();
+                }
 
                 $message = 'Employe cree avec succes. Compte utilisateur cree (mot de passe: password).';
             } else {

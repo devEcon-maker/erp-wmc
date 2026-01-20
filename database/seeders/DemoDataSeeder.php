@@ -167,6 +167,7 @@ class DemoDataSeeder extends Seeder
             ['first_name' => 'Hugo', 'last_name' => 'Richard', 'user' => null, 'dept' => 'Support', 'job_title' => 'Support Client'],
             ['first_name' => 'Lea', 'last_name' => 'Simon', 'user' => null, 'dept' => 'Technique', 'job_title' => 'Developpeur Junior'],
             ['first_name' => 'Thomas', 'last_name' => 'Laurent', 'user' => null, 'dept' => 'Comptabilite', 'job_title' => 'Comptable'],
+            ['first_name' => 'Affou', 'last_name' => 'Diakite', 'user' => null, 'dept' => 'Technique', 'job_title' => 'Chef de Projet'],
         ];
 
         $counter = 1;
@@ -300,7 +301,8 @@ class DemoDataSeeder extends Seeder
     private function createOpportunities(array $contacts, array $users): void
     {
         $stages = OpportunityStage::orderBy('order')->get();
-        if ($stages->isEmpty()) return;
+        if ($stages->isEmpty())
+            return;
 
         $prospects = collect($contacts)->where('type', 'prospect')->values();
 
@@ -413,7 +415,7 @@ class DemoDataSeeder extends Seeder
 
     private function getProposalNotes(string $status): string
     {
-        return match($status) {
+        return match ($status) {
             'draft' => 'Devis en cours de préparation.',
             'sent' => 'Devis envoyé au client, en attente de réponse.',
             'accepted' => 'Devis accepté par le client. Prêt pour conversion en facture.',
@@ -547,7 +549,8 @@ class DemoDataSeeder extends Seeder
         $clients = collect($contacts)->where('type', 'client')->values()->take(4);
         $maintenanceProducts = collect($products)->filter(fn($p) => str_starts_with($p->reference, 'MAINT'))->values();
 
-        if ($maintenanceProducts->isEmpty()) return;
+        if ($maintenanceProducts->isEmpty())
+            return;
 
         foreach ($clients as $client) {
             $startDate = Carbon::now()->subMonths(rand(1, 12));
@@ -599,7 +602,8 @@ class DemoDataSeeder extends Seeder
     private function createLeaveData(array $employees): void
     {
         $leaveTypes = LeaveType::all();
-        if ($leaveTypes->isEmpty()) return;
+        if ($leaveTypes->isEmpty())
+            return;
 
         $year = Carbon::now()->year;
 
@@ -635,7 +639,8 @@ class DemoDataSeeder extends Seeder
     private function createExpenseReports(array $employees): void
     {
         $categories = ExpenseCategory::all();
-        if ($categories->isEmpty()) return;
+        if ($categories->isEmpty())
+            return;
 
         foreach (collect($employees)->take(5) as $employee) {
             $report = ExpenseReport::firstOrCreate(

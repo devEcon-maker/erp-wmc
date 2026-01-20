@@ -243,7 +243,8 @@
                                     x-transition:leave="transition ease-in duration-75"
                                     x-transition:leave-start="transform opacity-100 scale-100"
                                     x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute right-0 bottom-full mb-2 w-56 rounded-xl bg-surface-dark border border-[#3a2e24] shadow-lg z-50">
+                                    style="display: none;"
+                                    class="absolute right-0 bottom-full mb-2 w-56 rounded-xl bg-surface-dark border border-[#3a2e24] shadow-xl z-[100]">
                                     <div class="py-1">
                                         @if($reminder->status === 'pending')
                                             <button wire:click="markAsSent({{ $reminder->id }})" @click="showActions = false"

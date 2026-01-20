@@ -1,6 +1,7 @@
 <div class="space-y-6">
     <!-- Header -->
-    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-surface-dark border border-[#3a2e24] p-6 rounded-2xl">
+    <div
+        class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-surface-dark border border-[#3a2e24] p-6 rounded-2xl">
         <div class="flex items-start gap-4">
             <div class="w-16 h-16 rounded-xl bg-primary/20 flex items-center justify-center">
                 <span class="material-symbols-outlined text-3xl text-primary">folder</span>
@@ -38,18 +39,21 @@
                     <span class="px-2 py-1 text-xs rounded-full border {{ $statusColors[$project->status] ?? '' }}">
                         {{ $statusLabels[$project->status] ?? $project->status }}
                     </span>
-                    <span class="px-2 py-1 text-xs rounded-full bg-surface-highlight text-text-secondary border border-[#3a2e24]">
+                    <span
+                        class="px-2 py-1 text-xs rounded-full bg-surface-highlight text-text-secondary border border-[#3a2e24]">
                         {{ $billingLabels[$project->billing_type] ?? $project->billing_type }}
                     </span>
                 </div>
             </div>
         </div>
         <div class="flex flex-wrap gap-2">
-            <x-ui.button type="secondary" href="{{ route('productivity.projects.index') }}" class="flex items-center gap-2">
+            <x-ui.button type="secondary" href="{{ route('productivity.projects.index') }}"
+                class="flex items-center gap-2">
                 <span class="material-symbols-outlined text-[20px]">arrow_back</span>
                 Retour
             </x-ui.button>
-            <x-ui.button type="secondary" href="{{ route('productivity.projects.edit', $project) }}" class="flex items-center gap-2">
+            <x-ui.button type="secondary" href="{{ route('productivity.projects.edit', $project) }}"
+                class="flex items-center gap-2">
                 <span class="material-symbols-outlined text-[20px]">edit</span>
                 Modifier
             </x-ui.button>
@@ -63,27 +67,30 @@
                 <x-ui.button type="secondary" @click="open = !open" class="flex items-center gap-2">
                     <span class="material-symbols-outlined text-[20px]">more_vert</span>
                 </x-ui.button>
-                <div x-show="open" @click.away="open = false"
-                    x-transition
+                <div x-show="open" @click.away="open = false" x-transition
                     class="absolute right-0 mt-2 w-48 bg-surface-dark border border-[#3a2e24] rounded-lg shadow-xl z-50">
                     @if($project->status === 'planning')
-                        <button wire:click="activate" class="w-full px-4 py-2 text-left text-sm text-white hover:bg-surface-highlight flex items-center gap-2">
+                        <button wire:click="activate"
+                            class="w-full px-4 py-2 text-left text-sm text-white hover:bg-surface-highlight flex items-center gap-2">
                             <span class="material-symbols-outlined text-[18px] text-green-400">play_arrow</span>
                             Activer
                         </button>
                     @endif
                     @if($project->status === 'active')
-                        <button wire:click="putOnHold" class="w-full px-4 py-2 text-left text-sm text-white hover:bg-surface-highlight flex items-center gap-2">
+                        <button wire:click="putOnHold"
+                            class="w-full px-4 py-2 text-left text-sm text-white hover:bg-surface-highlight flex items-center gap-2">
                             <span class="material-symbols-outlined text-[18px] text-yellow-400">pause</span>
                             Mettre en pause
                         </button>
-                        <button wire:click="complete" class="w-full px-4 py-2 text-left text-sm text-white hover:bg-surface-highlight flex items-center gap-2">
+                        <button wire:click="complete"
+                            class="w-full px-4 py-2 text-left text-sm text-white hover:bg-surface-highlight flex items-center gap-2">
                             <span class="material-symbols-outlined text-[18px] text-purple-400">check_circle</span>
                             Terminer
                         </button>
                     @endif
                     @if($project->status === 'on_hold')
-                        <button wire:click="activate" class="w-full px-4 py-2 text-left text-sm text-white hover:bg-surface-highlight flex items-center gap-2">
+                        <button wire:click="activate"
+                            class="w-full px-4 py-2 text-left text-sm text-white hover:bg-surface-highlight flex items-center gap-2">
                             <span class="material-symbols-outlined text-[18px] text-green-400">play_arrow</span>
                             Reprendre
                         </button>
@@ -96,7 +103,8 @@
                         </button>
                     @endif
                     <div class="border-t border-[#3a2e24]"></div>
-                    <button wire:click="delete" wire:confirm="Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible."
+                    <button wire:click="delete"
+                        wire:confirm="Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible."
                         class="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-surface-highlight flex items-center gap-2">
                         <span class="material-symbols-outlined text-[18px]">delete</span>
                         Supprimer
@@ -137,14 +145,13 @@
                 ];
             @endphp
             @foreach($tabs as $key => $tab)
-                <button wire:click="setTab('{{ $key }}')"
-                    class="px-4 py-3 text-sm font-medium transition-colors flex items-center gap-2
-                        {{ $activeTab === $key
-                            ? 'text-primary border-b-2 border-primary bg-primary/10'
-                            : 'text-text-secondary hover:text-white hover:bg-surface-highlight' }}">
-                    <span class="material-symbols-outlined text-[20px]">{{ $tab['icon'] }}</span>
-                    {{ $tab['label'] }}
-                </button>
+                    <button wire:click="setTab('{{ $key }}')" class="px-4 py-3 text-sm font-medium transition-colors flex items-center gap-2
+                                {{ $activeTab === $key
+                ? 'text-primary border-b-2 border-primary bg-primary/10'
+                : 'text-text-secondary hover:text-white hover:bg-surface-highlight' }}">
+                        <span class="material-symbols-outlined text-[20px]">{{ $tab['icon'] }}</span>
+                        {{ $tab['label'] }}
+                    </button>
             @endforeach
         </nav>
     </div>
@@ -169,26 +176,18 @@
                 <h3 class="text-lg font-semibold text-white mb-4">Ajouter un membre</h3>
 
                 <div class="space-y-4">
-                    <x-ui.select label="Employé *" wire:model="newMember.employee_id" :error="$errors->first('newMember.employee_id')">
+                    <x-ui.select label="Employé *" wire:model="newMember.employee_id"
+                        :error="$errors->first('newMember.employee_id')">
                         <option value="">Sélectionner un employé</option>
                         @foreach($availableEmployees as $employee)
                             <option value="{{ $employee->id }}">{{ $employee->full_name }}</option>
                         @endforeach
                     </x-ui.select>
 
-                    <x-ui.input
-                        label="Rôle"
-                        wire:model="newMember.role"
-                        placeholder="Ex: Développeur, Designer..."
-                    />
+                    <x-ui.input label="Rôle" wire:model="newMember.role" placeholder="Ex: Développeur, Designer..." />
 
-                    <x-ui.input
-                        type="number"
-                        step="0.01"
-                        label="Taux horaire (FCFA)"
-                        wire:model="newMember.hourly_rate"
-                        placeholder="Laisser vide pour utiliser le taux du projet"
-                    />
+                    <x-ui.input type="number" step="0.01" label="Taux horaire (FCFA)" wire:model="newMember.hourly_rate"
+                        placeholder="Laisser vide pour utiliser le taux du projet" />
                 </div>
 
                 <div class="flex justify-end gap-3 mt-6">
@@ -206,17 +205,18 @@
                 <h3 class="text-lg font-semibold text-white mb-4">Créer une tâche rapide</h3>
 
                 <div class="space-y-4">
-                    <x-ui.input
-                        label="Titre *"
-                        wire:model="quickTask.title"
-                        placeholder="Titre de la tâche"
-                        :error="$errors->first('quickTask.title')"
-                    />
+                    <x-ui.input label="Titre *" wire:model="quickTask.title" placeholder="Titre de la tâche"
+                        :error="$errors->first('quickTask.title')" />
 
                     <x-ui.select label="Assigné à" wire:model="quickTask.assigned_to">
                         <option value="">Non assigné</option>
+                        @if($project->manager)
+                            <option value="{{ $project->manager->id }}">{{ $project->manager->full_name }} (Manager)</option>
+                        @endif
                         @foreach($project->members as $member)
-                            <option value="{{ $member->id }}">{{ $member->full_name }}</option>
+                            @if($project->manager_id !== $member->id)
+                                <option value="{{ $member->id }}">{{ $member->full_name }}</option>
+                            @endif
                         @endforeach
                     </x-ui.select>
 
@@ -227,11 +227,7 @@
                         <option value="urgent">Urgente</option>
                     </x-ui.select>
 
-                    <x-ui.input
-                        type="date"
-                        label="Date d'échéance"
-                        wire:model="quickTask.due_date"
-                    />
+                    <x-ui.input type="date" label="Date d'échéance" wire:model="quickTask.due_date" />
                 </div>
 
                 <div class="flex justify-end gap-3 mt-6">

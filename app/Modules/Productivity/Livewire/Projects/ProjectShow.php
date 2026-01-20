@@ -95,7 +95,7 @@ class ProjectShow extends Component
     // Gestion rapide des tâches
     public function openQuickTaskModal()
     {
-        $this->quickTask = ['title' => '', 'assigned_to' => '', 'priority' => 'medium', 'due_date' => ''];
+        $this->quickTask = ['title' => '', 'assigned_to' => $this->project->manager_id, 'priority' => 'medium', 'due_date' => ''];
         $this->showQuickTaskModal = true;
     }
 
