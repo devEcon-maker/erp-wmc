@@ -51,15 +51,51 @@
 
             <x-ui.card title="Niveaux de Stock" class="bg-surface-dark border border-[#3a2e24]">
                 @if($product->track_stock)
-                    <div class="text-center py-6 text-text-secondary">
-                        <span class="material-symbols-outlined text-4xl mb-2 opacity-50">warehouse</span>
-                        <p>Gestion multi-entrepots a venir (Phase 4).</p>
-                        <p class="text-sm mt-2">Seuil d'alerte : <span class="text-primary font-bold">{{ $product->min_stock_alert }}</span></p>
+                    <div class="space-y-4">
+                        <!-- Stock Global -->
+                        <div class="bg-surface-highlight/50 border border-[#3a2e24] rounded-xl p-6 text-center">
+                            <span class="material-symbols-outlined text-5xl mb-3 {{ $product->current_stock <= ($product->min_stock_alert ?? 0) ? 'text-red-500' : 'text-primary' }}">
+                                inventory
+                            </span>
+                            <div>
+                                <p class="text-sm text-text-secondary uppercase tracking-wider mb-1">Stock Global</p>
+                                <p class="text-4xl font-bold text-white">
+                                    {{ $product->current_stock ?? 0 }}
+                                </p>
+                                <p class="text-sm text-text-secondary mt-1">{{ $product->unit }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Seuil d'alerte -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-surface-highlight/30 border border-[#3a2e24] rounded-lg p-4">
+                                <p class="text-xs text-text-secondary uppercase tracking-wider mb-1">Seuil d'alerte</p>
+                                <p class="text-2xl font-bold text-primary">{{ $product->min_stock_alert ?? 0 }}</p>
+                            </div>
+                            <div class="bg-surface-highlight/30 border border-[#3a2e24] rounded-lg p-4">
+                                <p class="text-xs text-text-secondary uppercase tracking-wider mb-1">Statut</p>
+                                @php
+                                    $isLowStock = ($product->current_stock ?? 0) <= ($product->min_stock_alert ?? 0);
+                                @endphp
+                                <p class="text-sm font-bold {{ $isLowStock ? 'text-red-500' : 'text-green-500' }}">
+                                    {{ $isLowStock ? '⚠️ Stock Faible' : '✓ Stock OK' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Lien vers historique -->
+                        <div class="text-center pt-2">
+                            <a href="{{ route('inventory.stock.dashboard') }}"
+                                class="text-sm text-primary hover:text-primary-hover hover:underline inline-flex items-center gap-1">
+                                <span>Voir l'historique des mouvements</span>
+                                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                            </a>
+                        </div>
                     </div>
                 @else
                     <div class="text-center py-6 text-text-secondary">
                         <span class="material-symbols-outlined text-4xl mb-2 opacity-50">inventory_2</span>
-                        <p>Ce produit n'est pas gere en stock.</p>
+                        <p>Ce produit n'est pas géré en stock.</p>
                     </div>
                 @endif
             </x-ui.card>

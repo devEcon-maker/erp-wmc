@@ -92,6 +92,19 @@
                                     <x-ui.input type="number" wire:model="min_stock_alert" label="Seuil d'alerte"
                                         :error="$errors->first('min_stock_alert')" />
                                 </div>
+
+                                <div class="w-48">
+                                    @if(!$product->exists)
+                                        <x-ui.input type="number" step="0.01" wire:model="initial_stock" label="Quantité initiale"
+                                            :error="$errors->first('initial_stock')" />
+                                    @else
+                                        <x-ui.input type="number" step="0.01" wire:model="current_stock_adjustment" label="Stock actuel"
+                                            :error="$errors->first('current_stock_adjustment')" />
+                                        <p class="text-xs text-text-secondary mt-1">
+                                            Modifiez cette valeur pour ajuster le stock
+                                        </p>
+                                    @endif
+                                </div>
                             @endif
                         </div>
                     </div>

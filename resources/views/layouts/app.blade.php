@@ -85,13 +85,14 @@
                                 <p class="text-sm font-medium">Devis et Proforma</p>
                             </a>
                         @endcan
-                        @can('orders.view')
+                        {{-- Temporairement masqué --}}
+                        {{-- @can('orders.view')
                             <a href="{{ route('crm.orders.index') }}"
                                 class="flex items-center gap-3 px-3 py-2.5 rounded-xl {{ request()->routeIs('crm.orders.*') ? 'bg-primary/10 text-primary border border-primary/20' : 'hover:bg-surface-highlight text-text-secondary hover:text-white' }} transition-colors">
                                 <span class="material-symbols-outlined text-[20px]">shopping_cart</span>
                                 <p class="text-sm font-medium">Commandes</p>
                             </a>
-                        @endcan
+                        @endcan --}}
                         @can('contracts.view')
                             <a href="{{ route('crm.contracts.index') }}"
                                 class="flex items-center gap-3 px-3 py-2.5 rounded-xl {{ request()->routeIs('crm.contracts.*') ? 'bg-primary/10 text-primary border border-primary/20' : 'hover:bg-surface-highlight text-text-secondary hover:text-white' }} transition-colors">

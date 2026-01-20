@@ -65,6 +65,19 @@ class Product extends Model
         return 100;
     }
 
+    public function getCurrentStockAttribute()
+    {
+        if (!$this->track_stock) {
+            return null;
+        }
+
+        // Calculer le stock à partir des mouvements
+        $stockIn = $this->movements()->where('type', 'in')->sum('quantity');
+        $stockOut = $this->movements()->where('type', 'out')->sum('quantity');
+
+        return $stockIn - $stockOut;
+    }
+
     // Scopes
     public function scopeActive($query)
     {

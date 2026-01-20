@@ -5,6 +5,8 @@ namespace App\Modules\Inventory\Livewire;
 use Livewire\Component;
 use App\Modules\Inventory\Models\Product;
 use App\Modules\Inventory\Models\ProductCategory;
+use App\Modules\Inventory\Models\Warehouse;
+use App\Modules\Inventory\Models\StockMovement;
 use Illuminate\Validation\Rule;
 
 class ProductForm extends Component
@@ -23,12 +25,15 @@ class ProductForm extends Component
     public $is_active = true;
     public $track_stock = true;
     public $min_stock_alert = 0;
+    public $initial_stock = 0;
+    public $current_stock_adjustment = 0;
 
     public function mount(Product $product = null)
     {
         if ($product && $product->exists) {
             $this->product = $product;
             $this->fill($product->toArray());
+            $this->current_stock_adjustment = $product->current_stock ?? 0;
         } else {
             $this->product = new Product();
             // Auto-generate reference draft? Or leave empty.
@@ -50,6 +55,8 @@ class ProductForm extends Component
             'is_active' => 'boolean',
             'track_stock' => 'boolean',
             'min_stock_alert' => 'nullable|integer|min:0',
+            'initial_stock' => 'nullable|numeric|min:0',
+            'current_stock_adjustment' => 'nullable|numeric|min:0',
         ];
     }
 
@@ -79,9 +86,40 @@ class ProductForm extends Component
         $this->validate();
 
         $isNew = !$this->product->exists;
+        $oldStock = $isNew ? 0 : ($this->product->current_stock ?? 0);
 
-        $this->product->fill($this->except('product', 'margin', 'margin_percent'));
+        $this->product->fill($this->except('product', 'margin', 'margin_percent', 'initial_stock', 'current_stock_adjustment'));
         $this->product->save();
+
+        $defaultWarehouse = Warehouse::first();
+
+        if ($defaultWarehouse && $this->track_stock) {
+            // Pour un nouveau produit : créer un mouvement de stock initial
+            if ($isNew && $this->initial_stock > 0) {
+                StockMovement::create([
+                    'product_id' => $this->product->id,
+                    'warehouse_id' => $defaultWarehouse->id,
+                    'type' => 'in',
+                    'quantity' => $this->initial_stock,
+                    'reason' => 'Stock initial lors de la création du produit',
+                    'created_by' => auth()->id(),
+                ]);
+            }
+
+            // Pour un produit existant : créer un ajustement si le stock a changé
+            if (!$isNew && $this->current_stock_adjustment != $oldStock) {
+                $difference = $this->current_stock_adjustment - $oldStock;
+
+                StockMovement::create([
+                    'product_id' => $this->product->id,
+                    'warehouse_id' => $defaultWarehouse->id,
+                    'type' => $difference > 0 ? 'in' : 'out',
+                    'quantity' => abs($difference),
+                    'reason' => 'Ajustement manuel du stock',
+                    'created_by' => auth()->id(),
+                ]);
+            }
+        }
 
         $message = $isNew
             ? "Produit {$this->product->name} créé avec succès."
