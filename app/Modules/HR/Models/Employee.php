@@ -200,6 +200,18 @@ class Employee extends Model
         return $this->hasMany(DevelopmentPlan::class);
     }
 
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(Task::class);
+    }
+
+    public function pendingTasks(): HasMany
+    {
+        return $this->hasMany(Task::class)->whereHas('status', function ($q) {
+            $q->where('is_completed', false);
+        });
+    }
+
     // Accesseurs
     public function getFullNameAttribute(): string
     {

@@ -28,6 +28,7 @@ class InvoiceShow extends Component
 
     // Delete Modal
     public $showDeleteModal = false;
+    public $deletionReason = '';
 
     public function mount(Invoice $invoice)
     {
@@ -134,48 +135,55 @@ class InvoiceShow extends Component
 
     public function confirmDelete()
     {
+        $this->deletionReason = '';
         $this->showDeleteModal = true;
     }
 
     public function cancelDelete()
     {
         $this->showDeleteModal = false;
+        $this->deletionReason = '';
     }
 
     public function deleteInvoice()
     {
+        $this->validate([
+            'deletionReason' => 'required|string|min:5|max:500',
+        ], [
+            'deletionReason.required' => 'Veuillez indiquer la raison de la suppression.',
+            'deletionReason.min' => 'La raison doit contenir au moins 5 caractères.',
+        ]);
+
         // Vérifier les permissions (Super admin, Admin, Comptable, Manager)
         $user = auth()->user();
         if (!$user->hasAnyRole(['super-admin', 'admin', 'comptable', 'manager'])) {
-            $this->dispatch('toast', [
-                'type' => 'error',
-                'message' => "Vous n'avez pas les droits pour supprimer une facture."
-            ]);
+            $this->dispatch('notify', type: 'error', message: "Vous n'avez pas les droits pour supprimer une facture.");
             $this->showDeleteModal = false;
             return;
         }
 
         // Vérifier si la facture peut être supprimée (pas de paiements)
         if ($this->invoice->payments->count() > 0) {
-            $this->dispatch('toast', [
-                'type' => 'error',
-                'message' => "Cette facture ne peut pas être supprimée car elle a des paiements enregistrés."
-            ]);
+            $this->dispatch('notify', type: 'error', message: "Cette facture ne peut pas être supprimée car elle a des paiements enregistrés.");
             $this->showDeleteModal = false;
             return;
         }
 
         // Vérifier si la facture n'est pas payée
         if ($this->invoice->status === 'paid') {
-            $this->dispatch('toast', [
-                'type' => 'error',
-                'message' => "Une facture payée ne peut pas être supprimée."
-            ]);
+            $this->dispatch('notify', type: 'error', message: "Une facture payée ne peut pas être supprimée.");
             $this->showDeleteModal = false;
             return;
         }
 
         $reference = $this->invoice->reference;
+
+        // Enregistrer qui a supprimé et pourquoi
+        $this->invoice->update([
+            'deleted_by' => $user->id,
+            'deletion_reason' => $this->deletionReason,
+        ]);
+
         $this->invoice->lines()->delete();
         $this->invoice->delete();
 

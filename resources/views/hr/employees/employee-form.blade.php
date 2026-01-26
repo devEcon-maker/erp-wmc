@@ -1,4 +1,4 @@
-<div class="max-w-5xl mx-auto space-y-6">
+<form wire:submit.prevent="save" class="max-w-5xl mx-auto space-y-6">
     <div class="flex justify-between items-center bg-surface-dark border border-[#3a2e24] p-6 rounded-2xl">
         <div>
             <h2 class="text-2xl font-bold text-white">
@@ -12,11 +12,33 @@
             <x-ui.button href="{{ route('hr.employees.index') }}" type="secondary">
                 Annuler
             </x-ui.button>
-            <x-ui.button wire:click="save" type="primary" class="shadow-lg shadow-primary/20">
-                Enregistrer
-            </x-ui.button>
+            <button type="submit" wire:click="save" class="inline-flex items-center justify-center font-bold rounded-xl shadow-sm focus:outline-none transition-all duration-200 text-white bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 px-5 py-2.5 text-sm" wire:loading.attr="disabled">
+                <span wire:loading.remove wire:target="save">Enregistrer</span>
+                <span wire:loading wire:target="save" class="flex items-center gap-2">
+                    <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Enregistrement...
+                </span>
+            </button>
         </div>
     </div>
+
+    <!-- Affichage des erreurs globales -->
+    @if($errors->any())
+        <div class="bg-red-500/10 border border-red-500/30 rounded-xl p-4">
+            <div class="flex items-center gap-2 text-red-400 mb-2">
+                <span class="material-symbols-outlined">error</span>
+                <span class="font-medium">Erreurs de validation</span>
+            </div>
+            <ul class="list-disc list-inside text-red-400 text-sm space-y-1">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     <!-- Compte Utilisateur (EN PREMIER pour nouveau employe) -->
     @if(!$employee)
@@ -94,7 +116,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <x-ui.input
-                wire:model="first_name"
+                wire:model.blur="first_name"
                 label="Prenom"
                 required
                 :readonly="$user_action === 'link' && $user_id"
@@ -102,7 +124,7 @@
                 :error="$errors->first('first_name')" />
 
             <x-ui.input
-                wire:model="last_name"
+                wire:model.blur="last_name"
                 label="Nom"
                 required
                 :readonly="$user_action === 'link' && $user_id"
@@ -110,7 +132,7 @@
                 :error="$errors->first('last_name')" />
 
             <x-ui.input
-                wire:model="email"
+                wire:model.blur="email"
                 type="email"
                 label="Email Professionnel"
                 required
@@ -118,8 +140,8 @@
                 placeholder="email@entreprise.com"
                 :error="$errors->first('email')" />
 
-            <x-ui.input wire:model="phone" label="Telephone" placeholder="+225 00 00 00 00" />
-            <x-ui.input wire:model="birth_date" type="date" label="Date de Naissance" />
+            <x-ui.input wire:model.blur="phone" label="Telephone" placeholder="+225 00 00 00 00" />
+            <x-ui.input wire:model.blur="birth_date" type="date" label="Date de Naissance" />
         </div>
     </x-ui.card>
 
@@ -127,15 +149,15 @@
     <x-ui.card class="bg-surface-dark border border-[#3a2e24]">
         <h3 class="text-lg font-bold text-white mb-4 border-b border-[#3a2e24] pb-2">Informations Poste</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <x-ui.input wire:model="job_title" label="Intitule du Poste" required placeholder="Ex: Developpeur Senior" />
-            <x-ui.select wire:model="department_id" label="Departement" required>
+            <x-ui.input wire:model.blur="job_title" label="Intitule du Poste" required placeholder="Ex: Developpeur Senior" :error="$errors->first('job_title')" />
+            <x-ui.select wire:model.blur="department_id" label="Departement" required :error="$errors->first('department_id')">
                 <option value="">Selectionner...</option>
                 @foreach($departments as $dept)
                     <option value="{{ $dept->id }}">{{ $dept->name }}</option>
                 @endforeach
             </x-ui.select>
 
-            <x-ui.select wire:model="manager_id" label="Manager (N+1)">
+            <x-ui.select wire:model.blur="manager_id" label="Manager (N+1)">
                 <option value="">Aucun</option>
                 @foreach($managers as $mgr)
                     <option value="{{ $mgr->id }}">{{ $mgr->full_name }}</option>
@@ -143,11 +165,11 @@
             </x-ui.select>
 
             <div class="grid grid-cols-2 gap-4">
-                <x-ui.input wire:model="hire_date" type="date" label="Date d'embauche" required />
-                <x-ui.input wire:model="end_date" type="date" label="Fin de contrat" />
+                <x-ui.input wire:model.blur="hire_date" type="date" label="Date d'embauche" required :error="$errors->first('hire_date')" />
+                <x-ui.input wire:model.blur="end_date" type="date" label="Fin de contrat" />
             </div>
 
-            <x-ui.select wire:model="contract_type" label="Type de Contrat" required>
+            <x-ui.select wire:model.blur="contract_type" label="Type de Contrat" required>
                 <option value="cdi">CDI</option>
                 <option value="cdd">CDD</option>
                 <option value="interim">Interim</option>
@@ -155,7 +177,7 @@
                 <option value="alternance">Alternance</option>
             </x-ui.select>
 
-            <x-ui.select wire:model="status" label="Statut" required>
+            <x-ui.select wire:model.blur="status" label="Statut" required>
                 <option value="active">Actif</option>
                 <option value="inactive">Inactif</option>
                 <option value="terminated">Termine</option>
@@ -167,7 +189,7 @@
     <x-ui.card class="bg-surface-dark border border-[#3a2e24]">
         <h3 class="text-lg font-bold text-white mb-4 border-b border-[#3a2e24] pb-2">Informations Administratives</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <x-ui.input wire:model="salary" type="number" step="0.01" label="Salaire Mensuel Brut (FCFA)" placeholder="Ex: 500000" />
+            <x-ui.input wire:model.blur="salary" type="number" step="0.01" label="Salaire Mensuel Brut (FCFA)" placeholder="Ex: 500000" />
 
             <!-- User Account for existing employee -->
             @if($employee)
@@ -197,4 +219,4 @@
             @endif
         </div>
     </x-ui.card>
-</div>
+</form>

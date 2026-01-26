@@ -145,6 +145,19 @@
                             <span class="material-symbols-outlined text-[20px]">person</span>
                             <p class="text-sm font-medium">Mon espace</p>
                         </a>
+                        <!-- Mes taches - accessible a tous les employes -->
+                        <a href="{{ route('hr.my-tasks') }}"
+                            class="flex items-center gap-3 px-3 py-2.5 rounded-xl {{ request()->routeIs('hr.my-tasks') ? 'bg-primary/10 text-primary border border-primary/20' : 'hover:bg-surface-highlight text-text-secondary hover:text-white' }} transition-colors">
+                            <span class="material-symbols-outlined text-[20px]">task_alt</span>
+                            <p class="text-sm font-medium">Mes taches</p>
+                        </a>
+                        @can('employees.view')
+                            <a href="{{ route('hr.tasks.index') }}"
+                                class="flex items-center gap-3 px-3 py-2.5 rounded-xl {{ request()->routeIs('hr.tasks.*') ? 'bg-primary/10 text-primary border border-primary/20' : 'hover:bg-surface-highlight text-text-secondary hover:text-white' }} transition-colors">
+                                <span class="material-symbols-outlined text-[20px]">checklist</span>
+                                <p class="text-sm font-medium">Gestion des taches</p>
+                            </a>
+                        @endcan
                         @can('employees.view')
                             <a href="{{ route('hr.employees.index') }}"
                                 class="flex items-center gap-3 px-3 py-2.5 rounded-xl {{ request()->routeIs('hr.employees.*') ? 'bg-primary/10 text-primary border border-primary/20' : 'hover:bg-surface-highlight text-text-secondary hover:text-white' }} transition-colors">

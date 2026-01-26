@@ -57,6 +57,13 @@ use App\Modules\HR\Livewire\Evaluations\DevelopmentPlansList;
 use App\Modules\HR\Livewire\Dashboard\HrDashboard;
 use App\Modules\HR\Livewire\Dashboard\EmployeeSelfService;
 
+// Tasks
+use App\Modules\HR\Livewire\Tasks\TasksList;
+use App\Modules\HR\Livewire\Tasks\TaskForm;
+use App\Modules\HR\Livewire\Tasks\TaskShow;
+use App\Modules\HR\Livewire\Tasks\TaskBoard;
+use App\Modules\HR\Livewire\Tasks\MyTasks;
+
 // Routes authentifiées
 Route::middleware(['auth', 'verified'])->prefix('hr')->name('hr.')->group(function () {
 
@@ -199,6 +206,27 @@ Route::middleware(['auth', 'verified'])->prefix('hr')->name('hr.')->group(functi
         // Mes evaluations - accessible a tous
         Route::get('/my-evaluations', MyEvaluations::class)->name('my-evaluations');
     });
+
+    // === TASKS (Taches) ===
+    Route::prefix('tasks')->name('tasks.')->group(function () {
+        // Administration des taches - RH/Admin
+        Route::middleware('permission:employees.view')->group(function () {
+            Route::get('/', TasksList::class)->name('index');
+            Route::get('/board', TaskBoard::class)->name('board');
+        });
+        // Creer - AVANT /{task}
+        Route::middleware('permission:employees.view')->group(function () {
+            Route::get('/create', TaskForm::class)->name('create');
+        });
+        // Voir et modifier - APRES /create
+        Route::middleware('permission:employees.view')->group(function () {
+            Route::get('/{task}', TaskShow::class)->name('show');
+            Route::get('/{task}/edit', TaskForm::class)->name('edit');
+        });
+    });
+
+    // Mes taches - accessible a tous les employes connectes
+    Route::get('/my-tasks', MyTasks::class)->name('my-tasks');
 });
 
 // === ROUTES PUBLIQUES (Candidatures) ===

@@ -36,6 +36,8 @@ class Invoice extends Model
         'notes',
         'terms',
         'created_by',
+        'deleted_by',
+        'deletion_reason',
     ];
 
     protected $casts = [
@@ -79,6 +81,11 @@ class Invoice extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function deleter(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'deleted_by');
+    }
+
     public function lines(): HasMany
     {
         return $this->hasMany(InvoiceLine::class);
@@ -87,6 +94,11 @@ class Invoice extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function paymentReminders(): HasMany
+    {
+        return $this->hasMany(PaymentReminder::class);
     }
 
     public function getRemainingBalanceAttribute()

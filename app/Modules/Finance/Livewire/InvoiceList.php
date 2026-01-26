@@ -13,8 +13,9 @@ class InvoiceList extends Component
     public $search = '';
     public $status = '';
     public $due_filter = ''; // 'overdue', 'this_month'
+    public $showDeleted = false;
 
-    protected $queryString = ['search', 'status', 'due_filter'];
+    protected $queryString = ['search', 'status', 'due_filter', 'showDeleted'];
 
     public function updatingSearch()
     {
@@ -23,8 +24,16 @@ class InvoiceList extends Component
 
     public function getInvoicesProperty()
     {
-        return Invoice::query()
-            ->with(['contact', 'creator'])
+        $query = Invoice::query();
+
+        // Afficher les factures supprimées si demandé
+        if ($this->showDeleted) {
+            $query->onlyTrashed()->with(['contact', 'creator', 'deleter']);
+        } else {
+            $query->with(['contact', 'creator']);
+        }
+
+        return $query
             ->when($this->search, function ($query) {
                 $query->where('reference', 'like', '%' . $this->search . '%')
                     ->orWhereHas('contact', function ($q) {
@@ -33,9 +42,9 @@ class InvoiceList extends Component
                             ->orWhere('company_name', 'like', '%' . $this->search . '%');
                     });
             })
-            ->when($this->status, fn($q) => $q->where('status', $this->status))
-            ->when($this->due_filter === 'overdue', fn($q) => $q->overdue())
-            ->orderBy('created_at', 'desc')
+            ->when($this->status && !$this->showDeleted, fn($q) => $q->where('status', $this->status))
+            ->when($this->due_filter === 'overdue' && !$this->showDeleted, fn($q) => $q->overdue())
+            ->orderBy($this->showDeleted ? 'deleted_at' : 'created_at', 'desc')
             ->paginate(15);
     }
 
@@ -45,6 +54,7 @@ class InvoiceList extends Component
             'total_due' => Invoice::unpaid()->sum('total_amount_ttc') - Invoice::unpaid()->sum('paid_amount'), // Approx
             'overdue_count' => Invoice::overdue()->count(),
             'paid_month' => Invoice::where('status', 'paid')->whereMonth('paid_at', now()->month)->sum('total_amount_ttc'),
+            'deleted_count' => Invoice::onlyTrashed()->count(),
         ];
     }
 

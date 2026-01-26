@@ -112,22 +112,30 @@ class PayrollPeriodShow extends Component
 
     public function validatePeriod()
     {
-        $payrollService = app(PayrollService::class);
-        $payrollService->validatePeriod($this->payrollPeriod);
+        try {
+            $payrollService = app(PayrollService::class);
+            $payrollService->validatePeriod($this->payrollPeriod, auth()->user());
 
-        $this->payrollPeriod->refresh();
-        $this->calculateStats();
-        $this->dispatch('notify', type: 'success', message: 'Période validée avec succès.');
+            $this->payrollPeriod->refresh();
+            $this->calculateStats();
+            $this->dispatch('notify', type: 'success', message: 'Période validée avec succès.');
+        } catch (\Exception $e) {
+            $this->dispatch('notify', type: 'error', message: $e->getMessage());
+        }
     }
 
-    public function markPeriodAsPaid()
+    public function markPeriodAsPaid($paymentMethod = 'bank_transfer')
     {
-        $payrollService = app(PayrollService::class);
-        $payrollService->markPeriodAsPaid($this->payrollPeriod);
+        try {
+            $payrollService = app(PayrollService::class);
+            $payrollService->markPeriodAsPaid($this->payrollPeriod, $paymentMethod);
 
-        $this->payrollPeriod->refresh();
-        $this->calculateStats();
-        $this->dispatch('notify', type: 'success', message: 'Période marquée comme payée.');
+            $this->payrollPeriod->refresh();
+            $this->calculateStats();
+            $this->dispatch('notify', type: 'success', message: 'Période marquée comme payée.');
+        } catch (\Exception $e) {
+            $this->dispatch('notify', type: 'error', message: $e->getMessage());
+        }
     }
 
     public function render()

@@ -95,10 +95,18 @@ class EmployeeForm extends Component
 
     public function rules()
     {
+        // Si on lie a un utilisateur existant, on ignore la validation d'unicite de l'email
+        // car l'email vient de l'utilisateur selectionne
+        $emailRule = ['required', 'email'];
+
+        if ($this->user_action !== 'link') {
+            $emailRule[] = Rule::unique('employees', 'email')->ignore($this->employee?->id);
+        }
+
         return [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => ['required', 'email', Rule::unique('employees', 'email')->ignore($this->employee?->id)],
+            'email' => $emailRule,
             'phone' => 'nullable|string|max:20',
             'birth_date' => 'nullable|date',
             'hire_date' => 'required|date',
@@ -139,6 +147,46 @@ class EmployeeForm extends Component
         if ($this->user_action === 'link' && empty($this->user_id)) {
             $this->addError('user_id', 'Veuillez selectionner un utilisateur.');
             return;
+        }
+
+        // Verifier que l'utilisateur n'est pas deja lie a un autre employe
+        if ($this->user_action === 'link' && $this->user_id) {
+            $userLinkQuery = Employee::where('user_id', $this->user_id);
+            if ($this->employee) {
+                $userLinkQuery->where('id', '!=', $this->employee->id);
+            }
+            $employeeLinkedToUser = $userLinkQuery->first();
+
+            if ($employeeLinkedToUser) {
+                $this->addError('user_id', 'Cet utilisateur est deja lie a l\'employe: ' . $employeeLinkedToUser->full_name);
+                return;
+            }
+
+            // Verifier si un employe avec cet email existe deja (sans compte utilisateur)
+            $emailQuery = Employee::withTrashed()->where('email', $this->email);
+            if ($this->employee) {
+                $emailQuery->where('id', '!=', $this->employee->id);
+            }
+            $employeeWithSameEmail = $emailQuery->first();
+
+            if ($employeeWithSameEmail) {
+                if ($employeeWithSameEmail->user_id) {
+                    $this->addError('email', 'Un employe avec cet email existe deja et est lie a un autre compte utilisateur.');
+                    return;
+                }
+
+                // L'employe existe mais n'a pas de compte - on va le lier au lieu de creer un nouveau
+                if ($employeeWithSameEmail->trashed()) {
+                    $employeeWithSameEmail->restore();
+                    $action = 'restauré et lié';
+                } else {
+                    $action = 'lié';
+                }
+
+                $employeeWithSameEmail->update(['user_id' => $this->user_id]);
+                $this->dispatch('notify', type: 'success', message: 'L\'employe existant "' . $employeeWithSameEmail->full_name . '" a ete ' . $action . ' au compte utilisateur.');
+                return redirect()->route('hr.employees.show', $employeeWithSameEmail);
+            }
         }
 
         // Sanitize data: Convert empty strings to null for nullable fields

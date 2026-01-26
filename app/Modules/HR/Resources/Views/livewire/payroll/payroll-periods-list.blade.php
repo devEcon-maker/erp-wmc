@@ -90,16 +90,17 @@
                             Générer bulletins
                         </button>
                         <span class="text-gray-300">|</span>
-                        <button wire:click="validatePeriod({{ $period->id }})"
-                                wire:confirm="Valider cette période? Cette action est irréversible."
-                                class="text-sm text-green-600 hover:text-green-800 font-medium">
-                            Valider
-                        </button>
-                        <span class="text-gray-300">|</span>
                         <button wire:click="deletePeriod({{ $period->id }})"
                                 wire:confirm="Supprimer cette période et tous ses bulletins?"
                                 class="text-sm text-red-600 hover:text-red-800 font-medium">
                             Supprimer
+                        </button>
+                    @elseif($period->status === 'processing')
+                        <span class="text-gray-300">|</span>
+                        <button wire:click="validatePeriod({{ $period->id }})"
+                                wire:confirm="Valider cette période? Cette action est irréversible."
+                                class="text-sm text-green-600 hover:text-green-800 font-medium">
+                            Valider
                         </button>
                     @elseif($period->status === 'validated')
                         <span class="text-gray-300">|</span>

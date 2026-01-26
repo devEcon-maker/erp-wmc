@@ -14,6 +14,7 @@
             </div>
             <span class="px-3 py-1 text-sm font-medium rounded-full
                 @if($payrollPeriod->status === 'draft') bg-gray-100 text-gray-800
+                @elseif($payrollPeriod->status === 'processing') bg-amber-100 text-amber-800
                 @elseif($payrollPeriod->status === 'validated') bg-blue-100 text-blue-800
                 @elseif($payrollPeriod->status === 'paid') bg-green-100 text-green-800
                 @else bg-red-100 text-red-800
@@ -57,6 +58,7 @@
                 </svg>
                 Générer bulletins
             </button>
+        @elseif($payrollPeriod->status === 'processing')
             <button wire:click="validatePeriod"
                     wire:confirm="Valider cette période? Les bulletins ne pourront plus être modifiés."
                     class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">

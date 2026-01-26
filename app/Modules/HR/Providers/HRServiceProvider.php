@@ -61,6 +61,13 @@ use App\Modules\HR\Livewire\Evaluations\DevelopmentPlansList;
 use App\Modules\HR\Livewire\Dashboard\HrDashboard;
 use App\Modules\HR\Livewire\Dashboard\EmployeeSelfService;
 
+// Tasks
+use App\Modules\HR\Livewire\Tasks\TasksList;
+use App\Modules\HR\Livewire\Tasks\TaskForm;
+use App\Modules\HR\Livewire\Tasks\TaskShow;
+use App\Modules\HR\Livewire\Tasks\TaskBoard;
+use App\Modules\HR\Livewire\Tasks\MyTasks;
+
 // Services
 use App\Modules\HR\Services\PayrollService;
 use App\Modules\HR\Services\AttendanceService;
@@ -132,6 +139,13 @@ class HRServiceProvider extends ServiceProvider
         // Register Livewire components - Dashboard
         Livewire::component('hr.dashboard.hr-dashboard', HrDashboard::class);
         Livewire::component('hr.dashboard.employee-self-service', EmployeeSelfService::class);
+
+        // Register Livewire components - Tasks
+        Livewire::component('hr.tasks.tasks-list', TasksList::class);
+        Livewire::component('hr.tasks.task-form', TaskForm::class);
+        Livewire::component('hr.tasks.task-show', TaskShow::class);
+        Livewire::component('hr.tasks.task-board', TaskBoard::class);
+        Livewire::component('hr.tasks.my-tasks', MyTasks::class);
     }
 
     public function register(): void

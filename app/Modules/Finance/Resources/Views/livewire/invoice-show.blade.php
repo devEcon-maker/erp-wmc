@@ -335,11 +335,32 @@
                         <p class="text-text-secondary text-sm">Cette action est irréversible</p>
                     </div>
                 </div>
-                <p class="text-text-secondary mb-6">
+                <p class="text-text-secondary mb-4">
                     Êtes-vous sûr de vouloir supprimer la facture <strong class="text-white">{{ $invoice->reference }}</strong> ?
-                    <br><br>
+                    <br>
                     <span class="text-xs">Montant: {{ number_format($invoice->total_amount_ttc, 0, ',', ' ') }} FCFA</span>
                 </p>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-text-secondary mb-2">
+                        Raison de la suppression <span class="text-red-400">*</span>
+                    </label>
+                    <textarea wire:model="deletionReason"
+                        rows="3"
+                        placeholder="Indiquez la raison de la suppression..."
+                        class="w-full px-3 py-2 bg-surface-highlight border border-[#3a2e24] rounded-xl text-white placeholder-text-secondary focus:border-primary-500 focus:ring-1 focus:ring-primary-500"></textarea>
+                    @error('deletionReason')
+                        <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl mb-4">
+                    <p class="text-xs text-amber-400">
+                        <span class="material-symbols-outlined text-[14px] align-middle">info</span>
+                        Cette suppression sera enregistrée avec votre nom, la date et l'heure.
+                    </p>
+                </div>
+
                 <div class="flex justify-end gap-3">
                     <button wire:click="cancelDelete"
                         class="px-4 py-2 rounded-xl border border-[#3a2e24] text-text-secondary hover:text-white hover:bg-surface-highlight font-medium transition-colors">

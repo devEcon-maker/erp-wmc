@@ -63,7 +63,7 @@
                 </div>
                 <div>
                     <span class="text-xs text-gray-500 dark:text-gray-400">Poste</span>
-                    <p class="font-medium text-gray-900 dark:text-white">{{ $payslip->employee->jobPosition?->title ?? '-' }}</p>
+                    <p class="font-medium text-gray-900 dark:text-white">{{ $payslip->employee->job_title ?? '-' }}</p>
                 </div>
                 <div>
                     <span class="text-xs text-gray-500 dark:text-gray-400">Département</span>

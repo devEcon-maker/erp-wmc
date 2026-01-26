@@ -133,20 +133,28 @@ class PayrollPeriodsList extends Component
     {
         $period = PayrollPeriod::findOrFail($periodId);
 
-        $payrollService = app(PayrollService::class);
-        $payrollService->validatePeriod($period);
+        try {
+            $payrollService = app(PayrollService::class);
+            $payrollService->validatePeriod($period, auth()->user());
 
-        $this->dispatch('notify', type: 'success', message: 'Période validée avec succès.');
+            $this->dispatch('notify', type: 'success', message: 'Période validée avec succès.');
+        } catch (\Exception $e) {
+            $this->dispatch('notify', type: 'error', message: $e->getMessage());
+        }
     }
 
-    public function markAsPaid($periodId)
+    public function markAsPaid($periodId, $paymentMethod = 'bank_transfer')
     {
         $period = PayrollPeriod::findOrFail($periodId);
 
-        $payrollService = app(PayrollService::class);
-        $payrollService->markPeriodAsPaid($period);
+        try {
+            $payrollService = app(PayrollService::class);
+            $payrollService->markPeriodAsPaid($period, $paymentMethod);
 
-        $this->dispatch('notify', type: 'success', message: 'Période marquée comme payée.');
+            $this->dispatch('notify', type: 'success', message: 'Période marquée comme payée.');
+        } catch (\Exception $e) {
+            $this->dispatch('notify', type: 'error', message: $e->getMessage());
+        }
     }
 
     public function deletePeriod($periodId)
