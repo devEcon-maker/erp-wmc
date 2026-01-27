@@ -75,6 +75,12 @@ class TaskForm extends Component
     {
         $validated = $this->validate();
 
+        // Convertir les chaines vides en null pour les champs optionnels
+        $validated['description'] = $validated['description'] ?: null;
+        $validated['due_date'] = $validated['due_date'] ?: null;
+        $validated['estimated_hours'] = $validated['estimated_hours'] ?: null;
+        $validated['notes'] = $validated['notes'] ?: null;
+
         // Ajouter assigned_by si c'est une nouvelle tache
         if (!$this->isEdit) {
             $validated['assigned_by'] = Auth::id();
