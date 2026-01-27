@@ -26,6 +26,10 @@
                     Terminer
                 </button>
             @endif
+            <a href="{{ route('hr.my-tasks.edit', $task) }}" class="bg-surface-dark hover:bg-surface-highlight text-white font-medium py-2 px-4 rounded-xl flex items-center gap-2 transition-colors border border-[#3a2e24]">
+                <span class="material-symbols-outlined text-[20px]">edit</span>
+                Modifier
+            </a>
         </div>
     </div>
 
