@@ -1,5 +1,5 @@
-<div class="relative" x-data="{ open: false }" @click.outside="open = false">
-    <button @click="open = !open" class="relative p-2 text-text-secondary hover:text-white hover:bg-surface-highlight rounded-lg transition-colors">
+<div class="relative" x-data="{ open: false }" @click.outside="open = false" wire:poll.30s="loadNotifications">
+    <button @click="open = !open; if(open) $wire.loadNotifications()" class="relative p-2 text-text-secondary hover:text-white hover:bg-surface-highlight rounded-lg transition-colors">
         <span class="material-symbols-outlined">notifications</span>
         @if($unreadCount > 0)
             <span class="absolute top-1 right-1 min-w-[18px] h-[18px] bg-red-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center px-1">

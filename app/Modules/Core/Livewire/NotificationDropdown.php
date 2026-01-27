@@ -2,6 +2,7 @@
 
 namespace App\Modules\Core\Livewire;
 
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class NotificationDropdown extends Component
@@ -14,11 +15,14 @@ class NotificationDropdown extends Component
         $this->loadNotifications();
     }
 
+    #[On('refresh-notifications')]
     public function loadNotifications(): void
     {
         $user = auth()->user();
-        $this->notifications = $user->unreadNotifications->take(10);
-        $this->unreadCount = $user->unreadNotifications->count();
+        if ($user) {
+            $this->notifications = $user->unreadNotifications()->take(10)->get();
+            $this->unreadCount = $user->unreadNotifications()->count();
+        }
     }
 
     public function markAsRead(string $notificationId): void

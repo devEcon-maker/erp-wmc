@@ -3,14 +3,10 @@
 namespace App\Notifications;
 
 use App\Modules\Productivity\Models\Project;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class ProjectMemberAdded extends Notification implements ShouldQueue
+class ProjectMemberAdded extends Notification
 {
-    use Queueable;
-
     public function __construct(
         public Project $project,
         public string $assignerName,

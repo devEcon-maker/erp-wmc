@@ -3,14 +3,10 @@
 namespace App\Notifications;
 
 use App\Modules\HR\Models\Task;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class EmployeeTaskAssigned extends Notification implements ShouldQueue
+class EmployeeTaskAssigned extends Notification
 {
-    use Queueable;
-
     public function __construct(
         public Task $task,
         public string $assignerName
