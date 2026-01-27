@@ -75,10 +75,12 @@ class ProjectShow extends Component
             return;
         }
 
-        $service->addMember($this->project, $this->newMember['employee_id'], [
-            'role' => $this->newMember['role'] ?: null,
-            'hourly_rate' => $this->newMember['hourly_rate'] ?: null,
-        ]);
+        $service->addMember(
+            $this->project,
+            $this->newMember['employee_id'],
+            $this->newMember['role'] ?: null,
+            $this->newMember['hourly_rate'] ?: null
+        );
 
         $this->project->refresh();
         $this->closeMemberModal();
