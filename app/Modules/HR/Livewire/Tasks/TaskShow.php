@@ -5,6 +5,7 @@ namespace App\Modules\HR\Livewire\Tasks;
 use App\Modules\HR\Models\Task;
 use App\Modules\HR\Models\TaskStatus;
 use App\Modules\HR\Models\Employee;
+use App\Notifications\EmployeeTaskAssigned;
 use Livewire\Component;
 
 class TaskShow extends Component
@@ -115,10 +116,20 @@ class TaskShow extends Component
             return;
         }
 
+        $employee = Employee::find($this->selectedEmployeeId);
+
         $this->task->assignees()->attach($this->selectedEmployeeId, [
             'assigned_by' => auth()->id(),
             'assigned_at' => now(),
         ]);
+
+        // Envoyer une notification a l'employe s'il a un compte utilisateur
+        if ($employee && $employee->user) {
+            $employee->user->notify(new EmployeeTaskAssigned(
+                $this->task,
+                auth()->user()->name
+            ));
+        }
 
         $this->task->load('assignees');
         $this->closeAssigneeModal();

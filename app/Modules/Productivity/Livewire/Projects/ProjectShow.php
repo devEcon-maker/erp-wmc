@@ -7,6 +7,7 @@ use App\Modules\Productivity\Models\Task;
 use App\Modules\Productivity\Models\TimeEntry;
 use App\Modules\Productivity\Services\ProjectService;
 use App\Modules\HR\Models\Employee;
+use App\Notifications\ProjectMemberAdded;
 use Livewire\Component;
 
 class ProjectShow extends Component
@@ -75,12 +76,23 @@ class ProjectShow extends Component
             return;
         }
 
+        $employee = Employee::find($this->newMember['employee_id']);
+
         $service->addMember(
             $this->project,
             $this->newMember['employee_id'],
             $this->newMember['role'] ?: null,
             $this->newMember['hourly_rate'] ?: null
         );
+
+        // Envoyer une notification a l'employe s'il a un compte utilisateur
+        if ($employee && $employee->user) {
+            $employee->user->notify(new ProjectMemberAdded(
+                $this->project,
+                auth()->user()->name,
+                $this->newMember['role'] ?: null
+            ));
+        }
 
         $this->project->refresh();
         $this->closeMemberModal();

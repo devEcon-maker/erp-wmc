@@ -2,8 +2,8 @@
     <button @click="open = !open" class="relative p-2 text-text-secondary hover:text-white hover:bg-surface-highlight rounded-lg transition-colors">
         <span class="material-symbols-outlined">notifications</span>
         @if($unreadCount > 0)
-            <span class="absolute top-1 right-1 min-w-[18px] h-[18px] bg-primary rounded-full text-[10px] font-bold text-white flex items-center justify-center px-1">
-                {{ $unreadCount > 99 ? '99+' : $unreadCount }}
+            <span class="absolute top-1 right-1 min-w-[18px] h-[18px] bg-red-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center px-1">
+                {{ $unreadCount > 9 ? '9+' : $unreadCount }}
             </span>
         @endif
     </button>
