@@ -63,6 +63,7 @@ use App\Modules\HR\Livewire\Tasks\TaskForm;
 use App\Modules\HR\Livewire\Tasks\TaskShow;
 use App\Modules\HR\Livewire\Tasks\TaskBoard;
 use App\Modules\HR\Livewire\Tasks\MyTasks;
+use App\Modules\HR\Livewire\Tasks\MyTaskShow;
 
 // Routes authentifiées
 Route::middleware(['auth', 'verified'])->prefix('hr')->name('hr.')->group(function () {
@@ -227,6 +228,7 @@ Route::middleware(['auth', 'verified'])->prefix('hr')->name('hr.')->group(functi
 
     // Mes taches - accessible a tous les employes connectes
     Route::get('/my-tasks', MyTasks::class)->name('my-tasks');
+    Route::get('/my-tasks/{task}', MyTaskShow::class)->name('my-tasks.show');
 });
 
 // === ROUTES PUBLIQUES (Candidatures) ===

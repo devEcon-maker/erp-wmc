@@ -25,7 +25,7 @@ class EmployeeTaskAssigned extends Notification
             'icon' => 'assignment_ind',
             'color' => 'bg-blue-500/20',
             'icon_color' => 'text-blue-400',
-            'url' => route('hr.tasks.show', $this->task),
+            'url' => route('hr.my-tasks.show', $this->task),
             'task_id' => $this->task->id,
         ];
     }

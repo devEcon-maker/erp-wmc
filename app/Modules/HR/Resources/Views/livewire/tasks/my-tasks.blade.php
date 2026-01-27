@@ -71,7 +71,7 @@
                             <div class="flex items-start justify-between gap-4">
                                 <div class="flex-1">
                                     <div class="flex items-center gap-3 mb-2">
-                                        <a href="{{ route('hr.tasks.show', $task) }}" class="text-white font-medium hover:text-primary transition-colors">
+                                        <a href="{{ route('hr.my-tasks.show', $task) }}" class="text-white font-medium hover:text-primary transition-colors">
                                             {{ $task->title }}
                                         </a>
                                         <span class="text-xs px-2 py-0.5 rounded {{ $task->priority_class }}">
@@ -101,14 +101,15 @@
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <select wire:change="quickStatusUpdate({{ $task->id }}, $event.target.value)"
-                                        class="text-xs px-2 py-1 rounded-lg border-0 {{ $task->status->color_class }} cursor-pointer">
+                                        class="text-xs pl-3 pr-8 py-1.5 rounded-lg border border-[#3a2e24] cursor-pointer appearance-none bg-no-repeat"
+                                        style="background-color: {{ $task->status->bg_hex }}; color: {{ $task->status->text_hex }}; background-image: url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 fill=%27none%27 viewBox=%270 0 24 24%27 stroke=%27%23888%27%3E%3Cpath stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%272%27 d=%27M19 9l-7 7-7-7%27/%3E%3C/svg%3E'); background-size: 16px; background-position: right 6px center;">
                                         @foreach($statuses as $status)
-                                            <option value="{{ $status->id }}" {{ $task->status_id == $status->id ? 'selected' : '' }}>
+                                            <option value="{{ $status->id }}" {{ $task->status_id == $status->id ? 'selected' : '' }} style="background-color: #1a1410; color: #fff;">
                                                 {{ $status->name }}
                                             </option>
                                         @endforeach
                                     </select>
-                                    <a href="{{ route('hr.tasks.show', $task) }}" class="p-2 rounded-lg hover:bg-background-dark text-text-secondary hover:text-white transition-colors">
+                                    <a href="{{ route('hr.my-tasks.show', $task) }}" class="p-2 rounded-lg hover:bg-background-dark text-text-secondary hover:text-white transition-colors">
                                         <span class="material-symbols-outlined text-[18px]">chevron_right</span>
                                     </a>
                                 </div>
@@ -152,7 +153,7 @@
                             <div class="flex-1 p-3 space-y-2 max-h-[60vh] overflow-y-auto custom-scrollbar">
                                 @foreach ($this->getTasksForStatus($status->id) as $task)
                                     <div class="bg-background-dark p-3 rounded-lg border border-[#3a2e24] hover:border-primary/50 transition-colors {{ $task->is_overdue ? 'border-red-500/30' : '' }}">
-                                        <a href="{{ route('hr.tasks.show', $task) }}" class="text-white text-sm font-medium hover:text-primary transition-colors line-clamp-2">
+                                        <a href="{{ route('hr.my-tasks.show', $task) }}" class="text-white text-sm font-medium hover:text-primary transition-colors line-clamp-2">
                                             {{ $task->title }}
                                         </a>
                                         <div class="flex justify-between items-center mt-2">

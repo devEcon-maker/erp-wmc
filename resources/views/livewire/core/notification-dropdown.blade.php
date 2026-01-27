@@ -1,5 +1,5 @@
 <div class="relative" x-data="{ open: false }" @click.outside="open = false" wire:poll.30s="loadNotifications">
-    <button @click="open = !open; if(open) $wire.loadNotifications()" class="relative p-2 text-text-secondary hover:text-white hover:bg-surface-highlight rounded-lg transition-colors">
+    <button @click="open = !open; if(open) $wire.openDropdown()" class="relative p-2 text-text-secondary hover:text-white hover:bg-surface-highlight rounded-lg transition-colors">
         <span class="material-symbols-outlined">notifications</span>
         @if($unreadCount > 0)
             <span class="absolute top-1 right-1 min-w-[18px] h-[18px] bg-red-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center px-1">
@@ -48,8 +48,20 @@
                             </button>
                         @endif
                     </div>
-                    @if(isset($notification->data['url']))
-                        <a href="{{ $notification->data['url'] }}" class="block mt-2 text-xs text-primary hover:text-primary/80">
+                    @php
+                        // Generer l'URL dynamiquement pour eviter les problemes de domaine
+                        $notificationUrl = null;
+                        if (isset($notification->data['task_id'])) {
+                            $notificationUrl = route('hr.my-tasks.show', $notification->data['task_id']);
+                        } elseif (isset($notification->data['project_id'])) {
+                            $notificationUrl = route('productivity.projects.show', $notification->data['project_id']);
+                        } elseif (isset($notification->data['url'])) {
+                            // Fallback: extraire le path de l'URL stockee
+                            $notificationUrl = parse_url($notification->data['url'], PHP_URL_PATH);
+                        }
+                    @endphp
+                    @if($notificationUrl)
+                        <a href="{{ $notificationUrl }}" class="block mt-2 text-xs text-primary hover:text-primary/80">
                             Voir les details
                         </a>
                     @endif
@@ -63,7 +75,7 @@
         </div>
 
         <div class="p-3 border-t border-[#3a2e24]">
-            <a href="{{ route('notifications.index') }}" class="block text-center text-sm text-primary hover:text-primary/80">
+            <a href="{{ route('notifications.index') }}" wire:click="markAllAsRead" class="block text-center text-sm text-primary hover:text-primary/80">
                 Voir toutes les notifications
             </a>
         </div>

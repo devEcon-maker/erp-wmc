@@ -25,6 +25,16 @@ class NotificationDropdown extends Component
         }
     }
 
+    public function openDropdown(): void
+    {
+        // Marquer toutes les notifications comme lues quand on ouvre le dropdown
+        $user = auth()->user();
+        if ($user && $user->unreadNotifications()->count() > 0) {
+            $user->unreadNotifications->markAsRead();
+            $this->unreadCount = 0;
+        }
+    }
+
     public function markAsRead(string $notificationId): void
     {
         $notification = auth()->user()->notifications()->find($notificationId);

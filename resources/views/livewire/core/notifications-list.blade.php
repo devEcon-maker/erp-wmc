@@ -63,9 +63,20 @@
                                 @endif
                                 <p class="text-xs text-text-secondary mt-2">{{ $notification->created_at->translatedFormat('d M Y H:i') }}</p>
                             </div>
+                            @php
+                                // Generer l'URL dynamiquement pour eviter les problemes de domaine
+                                $notificationUrl = null;
+                                if (isset($notification->data['task_id'])) {
+                                    $notificationUrl = route('hr.my-tasks.show', $notification->data['task_id']);
+                                } elseif (isset($notification->data['project_id'])) {
+                                    $notificationUrl = route('productivity.projects.show', $notification->data['project_id']);
+                                } elseif (isset($notification->data['url'])) {
+                                    $notificationUrl = parse_url($notification->data['url'], PHP_URL_PATH);
+                                }
+                            @endphp
                             <div class="flex items-center gap-2">
-                                @if(isset($notification->data['url']))
-                                    <a href="{{ $notification->data['url'] }}" class="p-2 text-text-secondary hover:text-primary rounded-lg hover:bg-surface-highlight">
+                                @if($notificationUrl)
+                                    <a href="{{ $notificationUrl }}" class="p-2 text-text-secondary hover:text-primary rounded-lg hover:bg-surface-highlight">
                                         <span class="material-symbols-outlined text-[18px]">open_in_new</span>
                                     </a>
                                 @endif

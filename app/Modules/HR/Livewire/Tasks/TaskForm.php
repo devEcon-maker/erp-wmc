@@ -5,6 +5,7 @@ namespace App\Modules\HR\Livewire\Tasks;
 use App\Modules\HR\Models\Task;
 use App\Modules\HR\Models\TaskStatus;
 use App\Modules\HR\Models\Employee;
+use App\Notifications\EmployeeTaskAssigned;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 
@@ -90,7 +91,17 @@ class TaskForm extends Component
             $this->task->update($validated);
             $message = 'Tache mise a jour avec succes.';
         } else {
-            Task::create($validated);
+            $task = Task::create($validated);
+
+            // Notifier l'employe assigne s'il a un compte utilisateur
+            $employee = Employee::find($validated['employee_id']);
+            if ($employee && $employee->user && $employee->user_id !== Auth::id()) {
+                $employee->user->notify(new EmployeeTaskAssigned(
+                    $task,
+                    Auth::user()->name
+                ));
+            }
+
             $message = 'Tache creee avec succes.';
         }
 
