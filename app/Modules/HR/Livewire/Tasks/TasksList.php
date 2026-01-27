@@ -99,7 +99,7 @@ class TasksList extends Component
                 $query->where('priority', $this->priority);
             })
             ->when($this->employeeId, function ($query) {
-                $query->where('employee_id', $this->employeeId);
+                $query->forEmployee($this->employeeId);
             })
             ->when($this->dateFilter, function ($query) {
                 match ($this->dateFilter) {
@@ -109,7 +109,7 @@ class TasksList extends Component
                     default => $query,
                 };
             })
-            ->with(['status', 'employee', 'assignedBy'])
+            ->with(['status', 'employee', 'assignedBy', 'assignees'])
             ->orderByRaw("CASE WHEN due_date IS NULL THEN 1 ELSE 0 END, due_date ASC")
             ->orderBy('priority', 'desc')
             ->paginate(20);

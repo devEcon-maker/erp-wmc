@@ -76,9 +76,9 @@ class TaskBoard extends Component
 
     public function getTasksForStatus($statusId)
     {
-        return Task::with(['employee', 'assignedBy'])
+        return Task::with(['employee', 'assignedBy', 'assignees'])
             ->where('status_id', $statusId)
-            ->when($this->employeeId, fn($q) => $q->where('employee_id', $this->employeeId))
+            ->when($this->employeeId, fn($q) => $q->forEmployee($this->employeeId))
             ->when($this->priority, fn($q) => $q->where('priority', $this->priority))
             ->orderByRaw("CASE priority WHEN 'urgent' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 ELSE 4 END")
             ->orderBy('due_date')

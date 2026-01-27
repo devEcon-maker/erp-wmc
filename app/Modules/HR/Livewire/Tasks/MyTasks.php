@@ -131,7 +131,7 @@ class MyTasks extends Component
             $tasks = Task::forEmployee($this->employee->id)
                 ->when($this->statusId, fn($q) => $q->where('status_id', $this->statusId))
                 ->when($this->priority, fn($q) => $q->where('priority', $this->priority))
-                ->with(['status'])
+                ->with(['status', 'employee', 'assignees'])
                 ->orderByRaw("CASE WHEN due_date IS NULL THEN 1 ELSE 0 END, due_date ASC")
                 ->orderByRaw("CASE priority WHEN 'urgent' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 ELSE 4 END")
                 ->paginate(15);

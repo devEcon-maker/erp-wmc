@@ -85,7 +85,7 @@
             <thead class="bg-background-dark">
                 <tr>
                     <th class="px-4 py-3 text-left text-xs font-bold text-text-secondary uppercase">Tache</th>
-                    <th class="px-4 py-3 text-left text-xs font-bold text-text-secondary uppercase">Employe</th>
+                    <th class="px-4 py-3 text-left text-xs font-bold text-text-secondary uppercase">Employes</th>
                     <th class="px-4 py-3 text-left text-xs font-bold text-text-secondary uppercase">Statut</th>
                     <th class="px-4 py-3 text-left text-xs font-bold text-text-secondary uppercase">Priorite</th>
                     <th class="px-4 py-3 text-left text-xs font-bold text-text-secondary uppercase">Echeance</th>
@@ -104,11 +104,35 @@
                             @endif
                         </td>
                         <td class="px-4 py-3">
-                            <div class="flex items-center gap-2">
-                                <div class="size-8 rounded-full bg-cover bg-center border border-[#3a2e24]"
-                                    style='background-image: url("https://ui-avatars.com/api/?name={{ urlencode($task->employee->full_name) }}&background=random&color=fff&size=64");'>
+                            <div class="flex items-center">
+                                <!-- Avatars en stack -->
+                                <div class="flex -space-x-2">
+                                    <!-- Proprietaire -->
+                                    <div class="size-8 rounded-full bg-cover bg-center border-2 border-surface-dark ring-2 ring-primary/30 z-10"
+                                        style='background-image: url("https://ui-avatars.com/api/?name={{ urlencode($task->employee->full_name) }}&background=random&color=fff&size=64");'
+                                        title="{{ $task->employee->full_name }} (Proprietaire)">
+                                    </div>
+                                    <!-- Participants -->
+                                    @foreach($task->assignees->take(3) as $assignee)
+                                        <div class="size-8 rounded-full bg-cover bg-center border-2 border-surface-dark"
+                                            style='background-image: url("https://ui-avatars.com/api/?name={{ urlencode($assignee->full_name) }}&background=random&color=fff&size=64");'
+                                            title="{{ $assignee->full_name }}">
+                                        </div>
+                                    @endforeach
+                                    @if($task->assignees->count() > 3)
+                                        <div class="size-8 rounded-full bg-surface-highlight border-2 border-surface-dark flex items-center justify-center text-xs text-white font-medium"
+                                            title="{{ $task->assignees->count() - 3 }} autres participants">
+                                            +{{ $task->assignees->count() - 3 }}
+                                        </div>
+                                    @endif
                                 </div>
-                                <span class="text-text-secondary text-sm">{{ $task->employee->full_name }}</span>
+                                <!-- Nom du proprietaire -->
+                                <div class="ml-3">
+                                    <span class="text-white text-sm">{{ $task->employee->full_name }}</span>
+                                    @if($task->assignees->count() > 0)
+                                        <span class="text-text-secondary text-xs block">+{{ $task->assignees->count() }} participant{{ $task->assignees->count() > 1 ? 's' : '' }}</span>
+                                    @endif
+                                </div>
                             </div>
                         </td>
                         <td class="px-4 py-3">
