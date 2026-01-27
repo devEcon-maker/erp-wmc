@@ -44,7 +44,7 @@ class HrAlertService
 
         $count = 0;
         foreach ($employees as $employee) {
-            $daysRemaining = now()->diffInDays($employee->contract_end_date);
+            $daysRemaining = (int) now()->diffInDays($employee->contract_end_date);
             $priority = match (true) {
                 $daysRemaining <= 7 => 'critical',
                 $daysRemaining <= 14 => 'high',
@@ -87,7 +87,7 @@ class HrAlertService
 
         $count = 0;
         foreach ($employees as $employee) {
-            $daysRemaining = now()->diffInDays($employee->probation_end_date);
+            $daysRemaining = (int) now()->diffInDays($employee->probation_end_date);
 
             $existing = HrAlert::where('employee_id', $employee->id)
                 ->where('type', 'probation_end')
@@ -128,7 +128,7 @@ class HrAlertService
                 continue;
             }
 
-            $daysRemaining = now()->diffInDays($document->expiry_date);
+            $daysRemaining = (int) now()->diffInDays($document->expiry_date);
 
             $existing = HrAlert::where('employee_id', $document->employee_id)
                 ->where('type', 'document_expiry')
@@ -179,7 +179,7 @@ class HrAlertService
                 $birthday->addYear();
             }
 
-            $daysRemaining = $today->diffInDays($birthday);
+            $daysRemaining = (int) $today->diffInDays($birthday);
             $age = $birthday->year - $employee->birth_date->year;
 
             $existing = HrAlert::where('employee_id', $employee->id)
@@ -232,7 +232,7 @@ class HrAlertService
                 $anniversary->addYear();
             }
 
-            $daysRemaining = $today->diffInDays($anniversary);
+            $daysRemaining = (int) $today->diffInDays($anniversary);
             $years = $anniversary->year - $employee->hire_date->year;
 
             // Ne pas creer d'alerte pour moins d'un an
@@ -281,7 +281,7 @@ class HrAlertService
             }
 
             $employee = $payment->loan->employee;
-            $daysRemaining = now()->diffInDays($payment->due_date, false);
+            $daysRemaining = (int) now()->diffInDays($payment->due_date, false);
             $isOverdue = $daysRemaining < 0;
 
             $existing = HrAlert::where('employee_id', $employee->id)

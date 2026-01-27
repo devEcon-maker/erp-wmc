@@ -168,8 +168,14 @@ class HrDashboard extends Component
 
     public function resolveAlert($alertId)
     {
+        $alert = HrAlert::find($alertId);
+        if (!$alert) {
+            $this->dispatch('notify', type: 'error', message: 'Alerte introuvable.');
+            return;
+        }
+
         $alertService = app(HrAlertService::class);
-        $alertService->resolveAlert($alertId, 'Résolu depuis le dashboard');
+        $alertService->resolveAlert($alert, auth()->user(), 'Résolu depuis le dashboard');
 
         $this->loadAlerts();
         $this->dispatch('notify', type: 'success', message: 'Alerte résolue.');
