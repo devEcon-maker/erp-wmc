@@ -137,9 +137,10 @@
                         </td>
                         <td class="px-4 py-3">
                             <select wire:change="quickStatusUpdate({{ $task->id }}, $event.target.value)"
-                                class="text-xs px-2 py-1 rounded-lg border-0 {{ $task->status->color_class }} cursor-pointer">
+                                class="text-xs pl-3 pr-8 py-1.5 rounded-lg border border-[#3a2e24] cursor-pointer appearance-none bg-no-repeat"
+                                style="background-color: {{ $task->status->bg_hex }}; color: {{ $task->status->text_hex }}; background-image: url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 fill=%27none%27 viewBox=%270 0 24 24%27 stroke=%27%23888%27%3E%3Cpath stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%272%27 d=%27M19 9l-7 7-7-7%27/%3E%3C/svg%3E'); background-size: 16px; background-position: right 6px center;">
                                 @foreach($statuses as $status)
-                                    <option value="{{ $status->id }}" {{ $task->status_id == $status->id ? 'selected' : '' }}>
+                                    <option value="{{ $status->id }}" {{ $task->status_id == $status->id ? 'selected' : '' }} style="background-color: #1a1410; color: #fff;">
                                         {{ $status->name }}
                                     </option>
                                 @endforeach
