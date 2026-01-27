@@ -115,7 +115,7 @@
                 <h3 class="text-white font-bold mb-4">Details</h3>
                 <dl class="space-y-4">
                     <div>
-                        <dt class="text-text-secondary text-xs uppercase font-bold">Assigne a</dt>
+                        <dt class="text-text-secondary text-xs uppercase font-bold">Proprietaire</dt>
                         <dd class="flex items-center gap-2 mt-1">
                             <div class="size-8 rounded-full bg-cover bg-center border border-[#3a2e24]"
                                 style='background-image: url("https://ui-avatars.com/api/?name={{ urlencode($task->employee->full_name) }}&background=random&color=fff&size=64");'>
@@ -124,6 +124,37 @@
                                 <p class="text-white text-sm">{{ $task->employee->full_name }}</p>
                                 <p class="text-text-secondary text-xs">{{ $task->employee->job_title }}</p>
                             </div>
+                        </dd>
+                    </div>
+
+                    <!-- Assignes additionnels -->
+                    <div>
+                        <dt class="text-text-secondary text-xs uppercase font-bold flex items-center justify-between">
+                            <span>Participants</span>
+                            <button wire:click="openAssigneeModal" class="text-primary hover:text-primary/80 transition-colors">
+                                <span class="material-symbols-outlined text-[18px]">person_add</span>
+                            </button>
+                        </dt>
+                        <dd class="mt-2 space-y-2">
+                            @forelse($task->assignees as $assignee)
+                                <div class="flex items-center justify-between group">
+                                    <div class="flex items-center gap-2">
+                                        <div class="size-7 rounded-full bg-cover bg-center border border-[#3a2e24]"
+                                            style='background-image: url("https://ui-avatars.com/api/?name={{ urlencode($assignee->full_name) }}&background=random&color=fff&size=64");'>
+                                        </div>
+                                        <div>
+                                            <p class="text-white text-sm">{{ $assignee->full_name }}</p>
+                                        </div>
+                                    </div>
+                                    <button wire:click="removeAssignee({{ $assignee->id }})"
+                                        wire:confirm="Retirer {{ $assignee->full_name }} de cette tache ?"
+                                        class="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 transition-all">
+                                        <span class="material-symbols-outlined text-[16px]">close</span>
+                                    </button>
+                                </div>
+                            @empty
+                                <p class="text-text-secondary text-xs italic">Aucun participant</p>
+                            @endforelse
                         </dd>
                     </div>
 
@@ -198,6 +229,52 @@
                     </button>
                     <button wire:click="deleteTask" class="px-4 py-2 rounded-xl bg-red-500 text-white hover:bg-red-600 font-medium transition-colors">
                         Supprimer
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Add Assignee Modal -->
+    @if($showAssigneeModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+            <div class="bg-surface-dark border border-[#3a2e24] rounded-2xl p-6 max-w-md w-full shadow-xl">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">person_add</span>
+                        Ajouter un participant
+                    </h3>
+                    <button wire:click="closeAssigneeModal" class="text-text-secondary hover:text-white transition-colors">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-text-secondary mb-2">Selectionner un employe</label>
+                    <select wire:model="selectedEmployeeId"
+                        class="w-full px-4 py-3 bg-background-dark border border-[#3a2e24] rounded-xl text-white focus:outline-none focus:border-primary">
+                        <option value="">-- Choisir un employe --</option>
+                        @foreach($availableEmployees as $emp)
+                            <option value="{{ $emp->id }}">{{ $emp->full_name }} - {{ $emp->job_title }}</option>
+                        @endforeach
+                    </select>
+                    @error('selectedEmployeeId')
+                        <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                @if($availableEmployees->isEmpty())
+                    <p class="text-text-secondary text-sm mb-4 italic">Aucun employe disponible a ajouter.</p>
+                @endif
+
+                <div class="flex justify-end gap-3">
+                    <button wire:click="closeAssigneeModal" class="px-4 py-2 rounded-xl border border-[#3a2e24] text-text-secondary hover:text-white hover:bg-surface-highlight font-medium transition-colors">
+                        Annuler
+                    </button>
+                    <button wire:click="addAssignee"
+                        @if($availableEmployees->isEmpty()) disabled @endif
+                        class="px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary/90 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        Ajouter
                     </button>
                 </div>
             </div>

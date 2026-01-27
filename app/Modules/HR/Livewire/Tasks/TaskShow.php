@@ -4,6 +4,7 @@ namespace App\Modules\HR\Livewire\Tasks;
 
 use App\Modules\HR\Models\Task;
 use App\Modules\HR\Models\TaskStatus;
+use App\Modules\HR\Models\Employee;
 use Livewire\Component;
 
 class TaskShow extends Component
@@ -14,10 +15,12 @@ class TaskShow extends Component
 
     public $showDeleteModal = false;
     public $showStatusModal = false;
+    public $showAssigneeModal = false;
+    public $selectedEmployeeId = '';
 
     public function mount(Task $task)
     {
-        $this->task = $task->load(['status', 'employee', 'assignedBy']);
+        $this->task = $task->load(['status', 'employee', 'assignedBy', 'assignees']);
         $this->actual_hours = $task->actual_hours ?? '';
         $this->notes = $task->notes ?? '';
     }
@@ -81,12 +84,78 @@ class TaskShow extends Component
         return $this->redirect(route('hr.tasks.index'), navigate: true);
     }
 
+    // Gestion des assignes
+    public function openAssigneeModal()
+    {
+        $this->selectedEmployeeId = '';
+        $this->showAssigneeModal = true;
+    }
+
+    public function closeAssigneeModal()
+    {
+        $this->showAssigneeModal = false;
+        $this->selectedEmployeeId = '';
+    }
+
+    public function addAssignee()
+    {
+        $this->validate([
+            'selectedEmployeeId' => 'required|exists:employees,id',
+        ]);
+
+        // Verifier que l'employe n'est pas deja assigne
+        if ($this->task->assignees()->where('employees.id', $this->selectedEmployeeId)->exists()) {
+            $this->addError('selectedEmployeeId', 'Cet employe est deja assigne a cette tache.');
+            return;
+        }
+
+        // Verifier que ce n'est pas le proprietaire de la tache
+        if ($this->task->employee_id == $this->selectedEmployeeId) {
+            $this->addError('selectedEmployeeId', 'Cet employe est deja le proprietaire de la tache.');
+            return;
+        }
+
+        $this->task->assignees()->attach($this->selectedEmployeeId, [
+            'assigned_by' => auth()->id(),
+            'assigned_at' => now(),
+        ]);
+
+        $this->task->load('assignees');
+        $this->closeAssigneeModal();
+
+        $this->dispatch('toast', [
+            'type' => 'success',
+            'message' => 'Employe ajoute a la tache.'
+        ]);
+    }
+
+    public function removeAssignee($employeeId)
+    {
+        $this->task->assignees()->detach($employeeId);
+        $this->task->load('assignees');
+
+        $this->dispatch('toast', [
+            'type' => 'success',
+            'message' => 'Employe retire de la tache.'
+        ]);
+    }
+
     public function render()
     {
         $statuses = TaskStatus::orderBy('order')->get();
 
+        // Employes disponibles pour assignation (exclure le proprietaire et les deja assignes)
+        $assignedIds = $this->task->assignees->pluck('id')->toArray();
+        $assignedIds[] = $this->task->employee_id;
+
+        $availableEmployees = Employee::where('status', 'active')
+            ->whereNotIn('id', $assignedIds)
+            ->orderBy('last_name')
+            ->get();
+
         return view('hr::livewire.tasks.task-show', [
             'statuses' => $statuses,
+            'availableEmployees' => $availableEmployees,
         ])->layout('layouts.app');
     }
 }

@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -58,6 +59,13 @@ class Task extends Model
     public function assignedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_by');
+    }
+
+    public function assignees(): BelongsToMany
+    {
+        return $this->belongsToMany(Employee::class, 'task_assignees', 'task_id', 'employee_id')
+            ->withPivot(['assigned_at', 'assigned_by'])
+            ->withTimestamps();
     }
 
     // Accesseurs
@@ -116,7 +124,12 @@ class Task extends Model
 
     public function scopeForEmployee(Builder $query, int $employeeId): Builder
     {
-        return $query->where('employee_id', $employeeId);
+        return $query->where(function ($q) use ($employeeId) {
+            $q->where('employee_id', $employeeId)
+              ->orWhereHas('assignees', function ($aq) use ($employeeId) {
+                  $aq->where('employees.id', $employeeId);
+              });
+        });
     }
 
     public function scopeByStatus(Builder $query, int $statusId): Builder
