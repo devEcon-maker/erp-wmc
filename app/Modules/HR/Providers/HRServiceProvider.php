@@ -67,6 +67,8 @@ use App\Modules\HR\Livewire\Tasks\TaskForm;
 use App\Modules\HR\Livewire\Tasks\TaskShow;
 use App\Modules\HR\Livewire\Tasks\TaskBoard;
 use App\Modules\HR\Livewire\Tasks\MyTasks;
+use App\Modules\HR\Livewire\Tasks\MyTaskShow;
+use App\Modules\HR\Livewire\Tasks\MyTaskEdit;
 
 // Services
 use App\Modules\HR\Services\PayrollService;
@@ -146,6 +148,8 @@ class HRServiceProvider extends ServiceProvider
         Livewire::component('hr.tasks.task-show', TaskShow::class);
         Livewire::component('hr.tasks.task-board', TaskBoard::class);
         Livewire::component('hr.tasks.my-tasks', MyTasks::class);
+        Livewire::component('hr.tasks.my-task-show', MyTaskShow::class);
+        Livewire::component('hr.tasks.my-task-edit', MyTaskEdit::class);
     }
 
     public function register(): void
